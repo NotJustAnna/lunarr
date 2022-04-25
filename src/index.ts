@@ -1,3 +1,3 @@
 import { startApp } from './manager';
 
-startApp('core', 'discord', 'http');
+startApp('controller', 'bot', 'http');
