@@ -1,15 +1,9 @@
-import { performance } from 'perf_hooks';
 import { Worker } from 'worker_threads';
 import { createLogger } from './common/logger';
-import * as console from 'console';
 
 export function startApp(...modules: string[]) {
-  const logger = createLogger('main');
-  logger.info('Starting application...', { modules });
-  let start = performance.now();
+  createLogger('main').info('Starting application...');
   new ModularApplication(modules);
-  let end = performance.now();
-  logger.info('Application started!', { time: end - start });
 }
 
 class ModularApplication {
@@ -18,17 +12,17 @@ class ModularApplication {
 
   constructor(modules: string[]) {
     for (const module of modules) {
-      const worker = new Worker(`${__dirname}/app/${module}/index.js`, {
+      const worker = new Worker(`${__dirname}/subsystem/${module}/start.js`, {
         execArgv: ['--require', './.pnp.cjs'],
       });
       this.workers[module] = worker;
 
       worker.on('message', this.messageRouter(module));
-      worker.on('error', err => {
-        console.error(err);
+      worker.on('error', error => {
+        ModularApplication.logger.error(`Error in ${module}`, { error });
       });
-      worker.on('exit', exitCode => {
-        console.info(`Worker ${module} exited with code ${exitCode}`);
+      worker.on('exit', code => {
+        ModularApplication.logger.log(code === 0 ? 'info' : 'error', `Worker ${module} exited with code ${code}`);
       });
     }
   }
