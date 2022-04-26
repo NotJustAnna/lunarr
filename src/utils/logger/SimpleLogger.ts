@@ -61,7 +61,7 @@ export class SimpleLogger extends Logger {
     quotingType: '"',
     replacer: (_, value: any) => {
       if (!(value instanceof Error)) {
-        return value;
+        return typeof value === 'function' ? value.toString() : value;
       }
 
       const error: any = {};

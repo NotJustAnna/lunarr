@@ -1,3 +1,3 @@
-import { startApp } from './manager';
+import { startApp } from './utils/init/mainThread';
 
-startApp('controller', 'bot', 'http');
+startApp('core', /*'discord',*/ 'http');

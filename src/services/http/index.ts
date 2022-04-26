@@ -1,9 +1,9 @@
 import express from 'express';
 import { Express, Request, Response } from 'express-serve-static-core';
-import { createLogger } from '../../common/logger';
-import { Subsystem } from '../../common/worker';
+import { createLogger } from '../../utils/logger';
+import { Service } from '../../utils/init/worker';
 
-export class FlixHttp implements Subsystem {
+export class FlixHttp implements Service {
   private static readonly logger = createLogger('FlixHttp');
 
   constructor() {
