@@ -1,0 +1,8 @@
+export enum SonarrEpisodeState {
+  NONE = 'NONE',
+  UNMONITORED = 'UNMONITORED',
+  MONITORED = 'MONITORED',
+  GRABBED = 'GRABBED',
+  IMPORTED = 'IMPORTED',
+  REMOVED = 'REMOVED',
+}
