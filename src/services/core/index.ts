@@ -1,16 +1,16 @@
 import { MessageSender, Service, ServiceInit } from '../../utils/init/worker';
-import { FlixDatabase } from './database';
 import { SonarrHandler } from './handler/sonarr';
 import { createLogger } from '../../utils/logger';
 import axios from 'axios';
-import { TvRequest } from '../../types/api/ombi/GetTvRequests';
-import { MovieRequest } from '../../types/api/ombi/GetMovieRequests';
+import { TvRequest } from '../../types/ombi/api/GetTvRequests';
+import { MovieRequest } from '../../types/ombi/api/GetMovieRequests';
 import * as process from 'process';
+import { FlixDataSource } from '../../database';
 
 export class FlixCore implements Service, ServiceInit {
   private static readonly logger = createLogger('FlixCore');
 
-  private readonly database: FlixDatabase = new FlixDatabase('./db');
+  private readonly database = FlixDataSource;
 
   private readonly sonarrHandler = new SonarrHandler(this.database);
 
@@ -18,14 +18,13 @@ export class FlixCore implements Service, ServiceInit {
   }
 
   async init() {
-    await this.database.load();
+    await this.database.initialize();
     await Promise.all([
       this.sonarrHandler.sync(),
       this.radarrSync(),
       this.ombiTvSync(),
       this.ombiMovieSync(),
     ]);
-    await this.database.save();
     FlixCore.logger.info(`FlixCore initialized, awaiting messages from other subsystems...`);
   }
 

@@ -1,0 +1,35 @@
+export interface OmbiWebhookEvent {
+  requestId?: string;
+  requestedUser?: string;
+  title?: string;
+  requestedDate?: string;
+  type?: string;
+  additionalInformation?: null | string;
+  longDate?: string;
+  shortDate?: string;
+  longTime?: string;
+  shortTime?: string;
+  overview?: string;
+  year?: string;
+  episodesList?: null | string;
+  seasonsList?: null | string;
+  posterImage?: string;
+  applicationName?: string;
+  applicationUrl?: string;
+  issueDescription?: string;
+  issueCategory?: string;
+  issueStatus?: string;
+  issueSubject?: string;
+  newIssueComment?: string;
+  issueUser?: string;
+  userName?: string;
+  alias?: string;
+  userPreference?: null;
+  denyReason?: null | string;
+  availableDate?: string;
+  requestStatus?: string;
+  providerId?: string;
+  partiallyAvailableEpisodeNumbers?: null;
+  partiallyAvailableSeasonNumber?: null;
+  notificationType?: string;
+}
