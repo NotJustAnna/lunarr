@@ -11,3 +11,5 @@
 #.pnp.*
 /dist/
 /.idea/
+/.vscode/
+/.env

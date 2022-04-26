@@ -1,11 +1,11 @@
 import { Client, Intents } from 'discord.js';
 import * as process from 'process';
 import * as console from 'console';
-import { createLogger } from '../../common/logger';
-import { Subsystem } from '../../common/worker';
+import { Service } from '../../utils/init/worker';
+import { createLogger } from '../../utils/logger';
 
-export class FlixBot implements Subsystem {
-  private static readonly logger = createLogger('FlixBot');
+export class FlixDiscord implements Service {
+  private static readonly logger = createLogger('FlixDiscord');
   private client: Client<true>;
 
   constructor() {
@@ -14,7 +14,7 @@ export class FlixBot implements Subsystem {
     });
 
     this.client.on('ready', () => {
-      FlixBot.logger.info(`Successfully logged in as ${this.client.user.tag}!`);
+      FlixDiscord.logger.info(`Successfully logged in as ${this.client.user.tag}!`);
     });
 
     this.client.login(process.env.DISCORD_TOKEN).catch(console.error);

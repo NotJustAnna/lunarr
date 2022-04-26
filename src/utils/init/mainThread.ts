@@ -1,5 +1,7 @@
 import { Worker } from 'worker_threads';
-import { createLogger } from './common/logger';
+import { createLogger } from '../logger';
+import 'dotenv/config';
+import { resolve } from 'path';
 
 export function startApp(...modules: string[]) {
   createLogger('main').info('Starting application...');
@@ -9,10 +11,16 @@ export function startApp(...modules: string[]) {
 class ModularApplication {
   private static readonly logger = createLogger('ModularApplication');
   private readonly workers: Record<string, Worker> = {};
+  private readonly specialTargets = ['main', '@error'];
 
   constructor(modules: string[]) {
+    const serviceDir = resolve(__dirname, '../../services');
+
     for (const module of modules) {
-      const worker = new Worker(`${__dirname}/subsystem/${module}/start.js`, {
+      if (this.specialTargets.includes(module)) {
+        ModularApplication.logger.warn(`Module ${module} is reserved and cannot be used as a module name`);
+      }
+      const worker = new Worker(`${serviceDir}/${module}/start.js`, {
         execArgv: ['--require', './.pnp.cjs'],
       });
       this.workers[module] = worker;
@@ -22,7 +30,7 @@ class ModularApplication {
         ModularApplication.logger.error(`Error in ${module}`, { error });
       });
       worker.on('exit', code => {
-        ModularApplication.logger.log(code === 0 ? 'info' : 'error', `Worker ${module} exited with code ${code}`);
+        ModularApplication.logger.log(code === 0 ? 'info' : 'error', `Worker "${module}" exited with code ${code}`);
       });
     }
   }
@@ -41,8 +49,12 @@ class ModularApplication {
       if (typeof dest !== 'string') {
         ModularApplication.logger.warn(INVALID_MESSAGE, { source, dest, body, reason: DESTINATION_NOT_A_STRING });
       }
-      if (dest ! in this.workers) {
+      if (dest === '@error') {
+        ModularApplication.logger.error(`Error received from worker "${source}"`, { source, dest, body });
+        return;
+      } else if (dest ! in this.workers) {
         ModularApplication.logger.warn(INVALID_MESSAGE, { source, dest, body, reason: DESTINATION_DOES_NOT_EXIST });
+        return;
       }
       this.workers[dest].postMessage(body);
       ModularApplication.logger.debug(MESSAGE_SENT, { source, dest, body });

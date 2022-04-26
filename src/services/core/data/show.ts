@@ -7,6 +7,7 @@ export interface Show {
    */
   id: string;
 
+  // TODO does Jellyfin have this?
   /**
    * Identifies this show on the connected Jellyfin server.
    */
@@ -23,6 +24,26 @@ export interface Show {
   ombiRequestId?: string;
 
   /**
+   * Identifies this movie on TVDB.
+   */
+  tvdbId?: string;
+
+  /**
+   * Identifies this movie on TvRage.
+   */
+  tvRageId?: string;
+
+  /**
+   * Identifies this movie on TvMaze.
+   */
+  tvMazeId?: string;
+
+  /**
+   * The title of the show.
+   */
+  title: string;
+
+  /**
    * This show's seasons.
    */
   seasons: Season[];
@@ -33,6 +54,8 @@ export interface Season {
    * Number of the season.
    */
   number: number;
+
+  // TODO does Jellyfin have this?
 
   /**
    * This season's episodes.
