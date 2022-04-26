@@ -1,4 +1,4 @@
 import { FlixDiscord } from './index';
-import { start } from '../../utils/init/worker';
+import { startService } from '../../utils/init/worker';
 
-start(FlixDiscord);
+startService(FlixDiscord);

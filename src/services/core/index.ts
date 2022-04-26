@@ -25,7 +25,8 @@ export class FlixCore implements Service, ServiceInit {
       this.ombiTvSync(),
       this.ombiMovieSync(),
     ]);
-    FlixCore.logger.info(`FlixCore initialized, awaiting messages from other subsystems...`);
+    FlixCore.logger.info(`FlixCore initialized, starting discord and http...`);
+    this.send(['@start', ['discord', 'http']]);
   }
 
   async onMessage(message: any) {

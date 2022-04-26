@@ -1,4 +1,4 @@
 import { FlixCore } from './index';
-import { start } from '../../utils/init/worker';
+import { startService } from '../../utils/init/worker';
 
-start(FlixCore);
+startService(FlixCore);

@@ -16,7 +16,7 @@ function hasInit(service: Service | ServiceInit): service is ServiceInit {
   return (service as ServiceInit).init !== undefined;
 }
 
-export function start(ServiceImpl: new (sender: MessageSender) => Service) {
+export function startService(ServiceImpl: new (sender: MessageSender) => Service) {
   startAsync(ServiceImpl).catch(err => {
     createLogger(ServiceImpl.name).error('Error while initializing service', { err });
     parentPort?.postMessage(['@error', err]);
