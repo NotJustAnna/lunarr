@@ -5,25 +5,13 @@ import { createLogger } from '../../../utils/logger';
 import axios from 'axios';
 import { PostOffice } from '../../../messaging/postOffice';
 import { ParentPortTransport } from '../../../messaging/transport/parentPort';
-import { SonarrSyncMessage } from '../../../messaging/messages/syncSonarr';
+import { SonarrSyncMessage } from '../../../messaging/messages/sync';
 import * as process from 'process';
 import { ExitCode } from '../../../utils/init/exitCode';
+import { attempt } from '../../../utils/attempt';
 
 const url = process.env.SONARR_URL!;
 const apiKey = process.env.SONARR_API_KEY!;
-
-async function attempt<T>(tries: number, func: () => T | Promise<T>) {
-  for (let i = 0; i < tries; i++) {
-    try {
-      return await func();
-    } catch (e) {
-      if (i === tries - 1) {
-        throw e;
-      }
-    }
-  }
-  throw new Error('Assertion error');
-}
 
 const logger = createLogger('Task "Sync Sonarr"');
 const postOffice = new PostOffice(new ParentPortTransport());
