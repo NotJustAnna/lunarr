@@ -33,6 +33,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         [null, {\
           "packageLocation": "./",\
           "packageDependencies": [\
+            ["@discordjs/builders", "npm:0.13.0"],\
             ["@discordjs/rest", "npm:0.4.1"],\
             ["@types/body-parser", "npm:1.19.2"],\
             ["@types/deep-equal", "npm:1.0.1"],\
@@ -81,6 +82,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["ts-mixer", "npm:6.0.1"],\
             ["tslib", "npm:2.3.1"],\
             ["zod", "npm:3.14.4"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
+        ["npm:0.13.0", {\
+          "packageLocation": "./.yarn/cache/@discordjs-builders-npm-0.13.0-6086d7ab89-1bce798b8f.zip/node_modules/@discordjs/builders/",\
+          "packageDependencies": [\
+            ["@discordjs/builders", "npm:0.13.0"],\
+            ["@sapphire/shapeshift", "npm:2.1.0"],\
+            ["@sindresorhus/is", "npm:4.6.0"],\
+            ["discord-api-types", "npm:0.31.2"],\
+            ["fast-deep-equal", "npm:3.1.3"],\
+            ["ts-mixer", "npm:6.0.1"],\
+            ["tslib", "npm:2.3.1"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -154,6 +168,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@sapphire-async-queue-npm-1.3.1-1787d10b40-4016010a8b.zip/node_modules/@sapphire/async-queue/",\
           "packageDependencies": [\
             ["@sapphire/async-queue", "npm:1.3.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@sapphire/shapeshift", [\
+        ["npm:2.1.0", {\
+          "packageLocation": "./.yarn/cache/@sapphire-shapeshift-npm-2.1.0-6e4187cfbf-74826ed31d.zip/node_modules/@sapphire/shapeshift/",\
+          "packageDependencies": [\
+            ["@sapphire/shapeshift", "npm:2.1.0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -1187,6 +1210,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["fast-deep-equal", [\
+        ["npm:3.1.3", {\
+          "packageLocation": "./.yarn/cache/fast-deep-equal-npm-3.1.3-790edcfcf5-e21a9d8d84.zip/node_modules/fast-deep-equal/",\
+          "packageDependencies": [\
+            ["fast-deep-equal", "npm:3.1.3"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["file-uri-to-path", [\
         ["npm:1.0.0", {\
           "packageLocation": "./.yarn/cache/file-uri-to-path-npm-1.0.0-1043ac6206-b648580bdd.zip/node_modules/file-uri-to-path/",\
@@ -1217,6 +1249,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./",\
           "packageDependencies": [\
             ["flixbot", "workspace:."],\
+            ["@discordjs/builders", "npm:0.13.0"],\
             ["@discordjs/rest", "npm:0.4.1"],\
             ["@types/body-parser", "npm:1.19.2"],\
             ["@types/deep-equal", "npm:1.0.1"],\
