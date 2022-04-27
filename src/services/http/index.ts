@@ -23,8 +23,4 @@ export class FlixHttp implements Service {
   handleJellyfin(req: Request, res: Response) {
     throw new Error('Method not implemented.');
   }
-
-  onMessage(message: any) {
-    console.log(message);
-  }
 }

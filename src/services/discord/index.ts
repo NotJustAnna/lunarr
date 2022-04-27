@@ -19,8 +19,4 @@ export class FlixDiscord implements Service {
 
     this.client.login(process.env.DISCORD_TOKEN).catch(console.error);
   }
-
-  onMessage(message: any) {
-    console.log(message);
-  }
 }

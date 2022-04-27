@@ -1,4 +1,4 @@
-import { MessageSender, Service, ServiceInit } from '../../utils/init/worker';
+import { Service, ServiceInit } from '../../utils/init/worker';
 import { SonarrHandler } from './handler/sonarr';
 import { createLogger } from '../../utils/logger';
 import axios from 'axios';
@@ -6,7 +6,10 @@ import { TvRequest } from '../../types/ombi/api/GetTvRequests';
 import { MovieRequest } from '../../types/ombi/api/GetMovieRequests';
 import * as process from 'process';
 import { FlixDataSource } from '../../database';
-import { PostOffice } from '../../utils/postOffice';
+import { MessageTransport } from '../../messaging/transport';
+import { PostOffice } from '../../messaging/postOffice';
+import { SonarrSyncMessage } from '../../messaging/messages/syncSonarr';
+import { Result } from '../../messaging/packet/types';
 
 export class FlixCore implements Service, ServiceInit {
   private static readonly logger = createLogger('FlixCore');
@@ -16,44 +19,45 @@ export class FlixCore implements Service, ServiceInit {
 
   private readonly sonarrHandler = new SonarrHandler(this.database);
 
-  constructor(send: MessageSender) {
-    this.postOffice = new PostOffice(send);
+  constructor(transport: MessageTransport) {
+    this.postOffice = new PostOffice(transport);
+    this.postOffice.ofType(SonarrSyncMessage, (_, { episodes, series }) => {
+      this.sonarrHandler.sync(series, episodes).catch(error => {
+        FlixCore.logger.error('Error while syncing Sonarr data', { error });
+      });
+      return Result.Continue;
+    });
   }
 
   async init() {
     await this.database.initialize();
 
-    this.postOffice.sendNoReply('@start', [
-      { name: 'core/sync-sonarr', dir: 'core/tasks/sync-sonarr.js' },
-      { name: 'core/sync-radarr', dir: 'core/tasks/sync-radarr.js' },
+    const syncSonarrAndRadarr = Promise.all([
+      this.postOffice.awaitServiceStop('core/sync-sonarr'),
+      this.postOffice.awaitServiceStop('core/sync-radarr'),
     ]);
 
-    await Promise.all([
-      this.postOffice.awaitByMessage('core/sync-sonarr', { type: 'done' }),
-      this.postOffice.awaitByMessage('core/sync-radarr', { type: 'done' }),
+    this.postOffice.startServices([
+      { name: 'core/sync-sonarr', file: 'core/tasks/sync-sonarr.js' },
+      { name: 'core/sync-radarr', file: 'core/tasks/sync-radarr.js' },
+    ]);
+    await syncSonarrAndRadarr;
+
+    const syncOmbiAndJellyfin = Promise.all([
+      this.postOffice.awaitServiceStop('core/sync-ombi-tv'),
+      this.postOffice.awaitServiceStop('core/sync-ombi-movies'),
+      this.postOffice.awaitServiceStop('core/sync-jellyfin'),
     ]);
 
-    this.postOffice.sendNoReply('@start', [
-      { name: 'core/sync-ombi-tv', dir: 'core/tasks/sync-ombi-tv.js' },
-      { name: 'core/sync-ombi-movies', dir: 'core/tasks/sync-ombi-movies.js' },
-      { name: 'core/sync-jellyfin', dir: 'core/tasks/sync-jellyfin.js' },
+    this.postOffice.startServices([
+      { name: 'core/sync-ombi-tv', file: 'core/tasks/sync-ombi-tv.js' },
+      { name: 'core/sync-ombi-movies', file: 'core/tasks/sync-ombi-movies.js' },
+      { name: 'core/sync-jellyfin', file: 'core/tasks/sync-jellyfin.js' },
     ]);
-
-    await Promise.all([
-      this.postOffice.awaitByMessage('core/sync-ombi-tv', { type: 'done' }),
-      this.postOffice.awaitByMessage('core/sync-ombi-movies', { type: 'done' }),
-      this.postOffice.awaitByMessage('core/sync-jellyfin', { type: 'done' }),
-    ]);
+    await syncOmbiAndJellyfin;
 
     FlixCore.logger.info(`FlixCore initialized, starting discord and http...`);
-    this.postOffice.sendNoReply('@start', ['discord', 'http']);
-  }
-
-  async onMessage(source: string, data: any, nonce?: any) {
-    this.postOffice.messageIncoming(source, data, nonce);
-    if (source === 'core/sync-sonarr') {
-      await this.sonarrHandler.handleSync(data);
-    }
+    this.postOffice.startServices(['discord', 'http']);
   }
 
   private async ombiTvSync() {

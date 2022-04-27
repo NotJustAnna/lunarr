@@ -1,5 +1,4 @@
 import { SonarrEpisode } from '../../../types/sonarr/api/SonarrEpisode';
-import axios from 'axios';
 import { createLogger } from '../../../utils/logger';
 import { SonarrSeries } from '../../../types/sonarr/api/SonarrSeries';
 import { DataSource, Repository } from 'typeorm';
@@ -25,48 +24,18 @@ export class SonarrHandler {
     this.episodeRepository = this.database.getRepository(ShowEpisode);
   }
 
-  async sync() {
-
-    SonarrHandler.logger.info('Syncing Sonarr data...');
-
-    const seriesResponse = await axios.get<SonarrSeries[]>(`${this.url}/api/series`, {
-      headers: {
-        'X-Api-key': this.apiKey,
-      },
-    });
-    SonarrHandler.logger.info(`Found ${seriesResponse.data.length} series`);
-
-    await Promise.all(seriesResponse.data.map(async (series) => {
-      SonarrHandler.logger.info(`Syncing Sonarr series "${series.title}"`);
-      const episodesPromise = axios.get<SonarrEpisode[]>(`${this.url}/api/episode?seriesId=${series.id}`, {
-        headers: {
-          'X-Api-key': this.apiKey,
-        },
-      });
-
-      const [show, episodesResponse] = await Promise.all([this.updateShows(series), episodesPromise]);
-      SonarrHandler.logger.info(`Found ${episodesResponse.data.length} episodes for series "${series.title}"`);
-      await this.updateEpisodes(show.id, episodesResponse.data);
-      SonarrHandler.logger.info(`Sonarr series "${series.title}" updated!`);
-    }));
-    SonarrHandler.logger.info('Sonarr sync complete!');
+  async sync(series: SonarrSeries, episodes: SonarrEpisode[]) {
+    const show = await this.createOrUpdateShow(series);
+    await this.updateEpisodes(show.id, episodes);
   }
 
-  private async updateShows(series: SonarrSeries): Promise<Show> {
+  private async createOrUpdateShow(series: SonarrSeries) {
     const show = await this.showRepository.findOne({
       where: [
-        {
-          sonarrId: String(series.id),
-        },
-        {
-          tvdbId: String(series.tvdbId),
-        },
-        {
-          tvMazeId: String(series.tvMazeId),
-        },
-        {
-          tvRageId: String(series.tvRageId),
-        },
+        { sonarrId: String(series.id) },
+        { tvdbId: String(series.tvdbId) },
+        { tvMazeId: String(series.tvMazeId) },
+        { tvRageId: String(series.tvRageId) },
       ],
     });
 
@@ -136,9 +105,5 @@ export class SonarrHandler {
     newSeason.showId = showId;
     newSeason.seasonNumber = seasonNumber;
     return this.seasonRepository.save(newSeason);
-  }
-
-  async handleSync(data: any) {
-
   }
 }
