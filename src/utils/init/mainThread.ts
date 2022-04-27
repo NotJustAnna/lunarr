@@ -15,7 +15,7 @@ export function startApp(...services: ServiceStart[]) {
 class ServiceManager {
   private static readonly logger = createLogger('ServiceManager');
   private static readonly serviceDir = resolve(__dirname, '../../services');
-  private readonly handlers: Record<string, (source: string, body: any) => void> = {
+  private readonly handlers: Record<string, (source: string, body: any, nonce?: any) => void> = {
     ['@error']: ServiceManager.handleError,
     ['@start']: this.handleStart.bind(this),
   };
@@ -26,7 +26,7 @@ class ServiceManager {
   }
 
   startService(service: ServiceStart) {
-    const { name, dir, workerData }: ServiceConfig = typeof service === 'string' ? { name: service } : service;
+    const { name, file, workerData }: ServiceConfig = typeof service === 'string' ? { name: service } : service;
     if (name.startsWith('@')) {
       ServiceManager.logger.error(`'@' is not allowed in service name because it is reserved for special commands. Service '${name}' will be ignored.`);
       return;
@@ -34,17 +34,25 @@ class ServiceManager {
       ServiceManager.logger.error(`Service '${name}' is already running.`);
       return;
     }
-    const worker = new Worker(`${(ServiceManager.serviceDir)}/${dir ?? name}/start.js`, {
+    const worker = new Worker(`${(ServiceManager.serviceDir)}/${file ?? `${name}/start.js`}`, {
       execArgv: ['--require', './.pnp.cjs'],
       workerData,
     });
     this.workers[name] = worker;
+    for (let key in this.workers) {
+      if (key !== name) {
+        this.workers[key].postMessage(['@start', name]);
+      }
+    }
 
     worker.on('message', this.messageRouter(name));
     worker.on('error', error => ServiceManager.handleError(name, error));
     worker.on('exit', code => {
-      ServiceManager.logger.log(code === 0 ? 'info' : 'error', `Worker "${name}" exited with code ${code}`);
       delete this.workers[name];
+      for (let key in this.workers) {
+        this.workers[key].postMessage(['@exit', name]);
+      }
+      ServiceManager.logger.log(code === 0 ? 'info' : 'error', `Worker "${name}" exited with code ${code}`);
     });
   }
 
@@ -72,28 +80,28 @@ class ServiceManager {
         ServiceManager.logger.error(INVALID_MESSAGE, { source, data, reason: NOT_ARRAY });
         return;
       }
-      if (data.length !== 2) {
+      if (data.length < 2) {
         ServiceManager.logger.error(INVALID_MESSAGE, { source, data, reason: INVALID_ARRAY_LENGTH });
         return;
       }
-      const [dest, body] = data;
+      const [dest, body, nonce] = data;
       if (typeof dest !== 'string') {
-        ServiceManager.logger.error(INVALID_MESSAGE, { source, dest, body, reason: DESTINATION_NOT_A_STRING });
+        ServiceManager.logger.error(INVALID_MESSAGE, { source, dest, body, nonce, reason: DESTINATION_NOT_A_STRING });
         return;
       }
       if (dest.startsWith('@')) {
         if (dest in this.handlers) {
-          this.handlers[dest](source, body);
+          this.handlers[dest](source, body, nonce);
         } else {
-          ServiceManager.logger.error(INVALID_MESSAGE, { source, dest, body, reason: UNKNOWN_COMMAND });
+          ServiceManager.logger.error(INVALID_MESSAGE, { source, dest, body, nonce, reason: UNKNOWN_COMMAND });
         }
         return;
       } else if (dest in this.workers) {
-        this.workers[dest].postMessage([source, body]);
-        ServiceManager.logger.debug(MESSAGE_SENT, { source, dest, body });
+        this.workers[dest].postMessage([source, body, nonce]);
+        ServiceManager.logger.debug(MESSAGE_SENT, { source, dest, body, nonce });
         return;
       }
-      ServiceManager.logger.error(INVALID_MESSAGE, { source, dest, body, reason: DESTINATION_DOES_NOT_EXIST });
+      ServiceManager.logger.error(INVALID_MESSAGE, { source, dest, body, nonce, reason: DESTINATION_DOES_NOT_EXIST });
       return;
     };
   }

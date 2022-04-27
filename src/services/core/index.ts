@@ -6,31 +6,54 @@ import { TvRequest } from '../../types/ombi/api/GetTvRequests';
 import { MovieRequest } from '../../types/ombi/api/GetMovieRequests';
 import * as process from 'process';
 import { FlixDataSource } from '../../database';
+import { PostOffice } from '../../utils/postOffice';
 
 export class FlixCore implements Service, ServiceInit {
   private static readonly logger = createLogger('FlixCore');
 
   private readonly database = FlixDataSource;
+  private readonly postOffice: PostOffice;
 
   private readonly sonarrHandler = new SonarrHandler(this.database);
 
-  constructor(private readonly send: MessageSender) {
+  constructor(send: MessageSender) {
+    this.postOffice = new PostOffice(send);
   }
 
   async init() {
     await this.database.initialize();
-    await Promise.all([
-      this.sonarrHandler.sync(),
-      this.radarrSync(),
-      this.ombiTvSync(),
-      this.ombiMovieSync(),
+
+    this.postOffice.sendNoReply('@start', [
+      { name: 'core/sync-sonarr', dir: 'core/tasks/sync-sonarr.js' },
+      { name: 'core/sync-radarr', dir: 'core/tasks/sync-radarr.js' },
     ]);
+
+    await Promise.all([
+      this.postOffice.awaitByMessage('core/sync-sonarr', { type: 'done' }),
+      this.postOffice.awaitByMessage('core/sync-radarr', { type: 'done' }),
+    ]);
+
+    this.postOffice.sendNoReply('@start', [
+      { name: 'core/sync-ombi-tv', dir: 'core/tasks/sync-ombi-tv.js' },
+      { name: 'core/sync-ombi-movies', dir: 'core/tasks/sync-ombi-movies.js' },
+      { name: 'core/sync-jellyfin', dir: 'core/tasks/sync-jellyfin.js' },
+    ]);
+
+    await Promise.all([
+      this.postOffice.awaitByMessage('core/sync-ombi-tv', { type: 'done' }),
+      this.postOffice.awaitByMessage('core/sync-ombi-movies', { type: 'done' }),
+      this.postOffice.awaitByMessage('core/sync-jellyfin', { type: 'done' }),
+    ]);
+
     FlixCore.logger.info(`FlixCore initialized, starting discord and http...`);
-    this.send(['@start', ['discord', 'http']]);
+    this.postOffice.sendNoReply('@start', ['discord', 'http']);
   }
 
-  async onMessage(message: any) {
-    console.log(message);
+  async onMessage(source: string, data: any, nonce?: any) {
+    this.postOffice.messageIncoming(source, data, nonce);
+    if (source === 'core/sync-sonarr') {
+      await this.sonarrHandler.handleSync(data);
+    }
   }
 
   private async ombiTvSync() {

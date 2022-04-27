@@ -137,4 +137,8 @@ export class SonarrHandler {
     newSeason.seasonNumber = seasonNumber;
     return this.seasonRepository.save(newSeason);
   }
+
+  async handleSync(data: any) {
+
+  }
 }
