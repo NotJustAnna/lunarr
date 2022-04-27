@@ -2,8 +2,12 @@ import 'source-map-support/register';
 import { SonarrSeries } from '../../../types/sonarr/api/SonarrSeries';
 import { SonarrEpisode } from '../../../types/sonarr/api/SonarrEpisode';
 import { createLogger } from '../../../utils/logger';
-import { parentPort } from '../../../utils/workers';
 import axios from 'axios';
+import { PostOffice } from '../../../messaging/postOffice';
+import { ParentPortTransport } from '../../../messaging/transport/parentPort';
+import { SonarrSyncMessage } from '../../../messaging/messages/syncSonarr';
+import * as process from 'process';
+import { ExitCode } from '../../../utils/init/exitCode';
 
 const url = process.env.SONARR_URL!;
 const apiKey = process.env.SONARR_API_KEY!;
@@ -21,8 +25,8 @@ async function attempt<T>(tries: number, func: () => T | Promise<T>) {
   throw new Error('Assertion error');
 }
 
-const logger = createLogger('task/sync-sonarr');
-const port = parentPort(logger);
+const logger = createLogger('Task "Sync Sonarr"');
+const postOffice = new PostOffice(new ParentPortTransport());
 
 async function main() {
   logger.info('Syncing Series...');
@@ -38,11 +42,6 @@ async function main() {
   const allSeries = seriesResponse.data;
   logger.info(`Found ${allSeries.length} series. Syncing episodes...`);
 
-  port.postMessage(['core', {
-    type: 'all-series',
-    data: allSeries,
-  }]);
-
   let seriesDone = 0;
 
   const allEpisodesSynced = Promise.all(allSeries.map(async (series) => {
@@ -53,37 +52,33 @@ async function main() {
         },
       });
     });
-    port.postMessage(['core', {
-      type: 'episodes',
-      seriesId: series.id,
-      data: episodesPromise.data,
-    }]);
+    postOffice.send('core', new SonarrSyncMessage({
+      series, episodes: episodesPromise.data,
+    }));
+    seriesDone++;
   }));
 
-  function logProgress() {
+  function logProgress(value: number = 0) {
     setTimeout(() => {
       if (seriesDone !== allSeries.length) {
-        // percentage of series done
-        const progress = Math.floor((seriesDone / allSeries.length) * 1000) / 10;
+        if (seriesDone !== value) {
+          // percentage of series done
+          const progress = Math.floor((seriesDone / allSeries.length) * 1000) / 10;
 
-        logger.info(`Synced episodes of ${seriesDone} of ${allSeries.length} series. (${progress}% done)`);
-        logProgress();
+          logger.info(`Synced episodes of ${seriesDone} of ${allSeries.length} series. (${progress}% done)`);
+        }
+        logProgress(seriesDone);
       }
-    }, 1000);
+    }, 500);
   }
 
   logProgress();
   await allEpisodesSynced;
-  port.postMessage(['core', {
-    type: 'done',
-  }]);
   logger.info('Sonarr sync complete!');
+  process.exit(ExitCode.SUCCESS);
 }
 
 main().catch((e) => {
-  port.postMessage(['@error', e]);
-  port.postMessage(['core', {
-    type: 'done',
-  }]);
-  process.exit(1);
+  postOffice.sendError(e);
+  process.exit(ExitCode.SOFTWARE_ERROR);
 });

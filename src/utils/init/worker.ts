@@ -1,12 +1,14 @@
 import { createLogger } from '../logger';
 import 'dotenv/config';
-import { parentPort } from '../workers';
-import { MessagePort } from 'worker_threads';
+import { ParentPortTransport } from '../../messaging/transport/parentPort';
+import { MessageTransport } from '../../messaging/transport';
+import { ErrorMessage } from '../../messaging/messages';
+import * as process from 'process';
+import { ExitCode } from './exitCode';
 
 export type MessageSender = (destination: string, data: any, nonce?: any) => void;
 
 export interface Service {
-  onMessage(source: string, data: any, nonce?: any): void | Promise<void>;
 }
 
 export interface ServiceInit {
@@ -17,29 +19,23 @@ function hasInit(service: Service | ServiceInit): service is ServiceInit {
   return (service as ServiceInit).init !== undefined;
 }
 
-export function startService(ServiceImpl: new (sender: MessageSender) => Service) {
-  const port = parentPort();
-
-  asyncStart(port, ServiceImpl).catch(err => {
-    createLogger(ServiceImpl.name).error('Error while initializing service', { err });
-    parentPort().postMessage(['@error', err]);
-    process.exit(70);
+export function startService(ServiceImpl: new (transport: MessageTransport) => Service) {
+  const transport = new ParentPortTransport();
+  asyncStart(transport, ServiceImpl).catch(error => {
+    const logger = createLogger(ServiceImpl.name);
+    logger.error('Error while initializing service', { error });
+    transport.send('@error', new ErrorMessage(error));
+    process.exit(ExitCode.SOFTWARE_ERROR);
   });
 }
 
-async function asyncStart(port: MessagePort, ServiceImpl: new (sender: MessageSender) => Service) {
+async function asyncStart(transport: MessageTransport, ServiceImpl: new (transport: MessageTransport) => Service) {
   const logger = createLogger(ServiceImpl.name);
 
   logger.info(`Starting ${ServiceImpl.name} service...`);
-  const sender = (destination: string, data: any, nonce?: any) => {
-    port.postMessage([destination, data, nonce]);
-  };
-  const service: Service = new ServiceImpl(sender);
+
+  const service: Service = new ServiceImpl(transport);
   if (hasInit(service)) {
     await service.init();
   }
-  port.on('message', (message: any) => {
-    const [destination, data, nonce] = message;
-    service.onMessage(destination, data, nonce);
-  });
 }

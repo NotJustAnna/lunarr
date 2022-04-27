@@ -1,6 +1,8 @@
 import { MessagePort, parentPort as port } from 'worker_threads';
 import { Logger } from './logger/Logger';
 import { createLogger } from './logger';
+import * as process from 'process';
+import { ExitCode } from './init/exitCode';
 
 export function parentPort(logger?: Logger): MessagePort {
   if (!port) {
@@ -8,7 +10,7 @@ export function parentPort(logger?: Logger): MessagePort {
     logger.error('Tried to start service worker on the main thread.');
     logger.error('This is not supported. Please run the service worker in a worker thread.');
 
-    process.exit(78); // configuration error
+    process.exit(ExitCode.CONFIGURATION_ERROR);
     throw Error('This code is meant to run on a worker thread!');
   }
   return port;
