@@ -1,11 +1,12 @@
-import { parentPort } from 'worker_threads';
 import { createLogger } from '../logger';
 import 'dotenv/config';
+import { parentPort } from '../workers';
+import { MessagePort } from 'worker_threads';
 
-export type MessageSender = (message: [dest: string, data: any]) => void;
+export type MessageSender = (destination: string, data: any, nonce?: any) => void;
 
 export interface Service {
-  onMessage(data: any): void | Promise<void>;
+  onMessage(source: string, data: any, nonce?: any): void | Promise<void>;
 }
 
 export interface ServiceInit {
@@ -17,28 +18,28 @@ function hasInit(service: Service | ServiceInit): service is ServiceInit {
 }
 
 export function startService(ServiceImpl: new (sender: MessageSender) => Service) {
-  startAsync(ServiceImpl).catch(err => {
+  const port = parentPort();
+
+  asyncStart(port, ServiceImpl).catch(err => {
     createLogger(ServiceImpl.name).error('Error while initializing service', { err });
-    parentPort?.postMessage(['@error', err]);
+    parentPort().postMessage(['@error', err]);
     process.exit(70);
   });
 }
 
-export async function startAsync(ServiceImpl: new (sender: MessageSender) => Service) {
+async function asyncStart(port: MessagePort, ServiceImpl: new (sender: MessageSender) => Service) {
   const logger = createLogger(ServiceImpl.name);
-  const port = parentPort;
-  if (!port) {
-    logger.error('Tried to start service worker on the main thread.');
-    logger.error('This is not supported. Please run the service worker in a worker thread.');
-
-    process.exit(78); // configuration error
-    throw Error('This code is meant to run on a worker thread!');
-  }
 
   logger.info(`Starting ${ServiceImpl.name} service...`);
-  const service: Service = new (ServiceImpl as any)(port.postMessage.bind(port));
+  const sender = (destination: string, data: any, nonce?: any) => {
+    port.postMessage([destination, data, nonce]);
+  };
+  const service: Service = new ServiceImpl(sender);
   if (hasInit(service)) {
     await service.init();
   }
-  port.on('message', service.onMessage.bind(service));
+  port.on('message', (message: any) => {
+    const [destination, data, nonce] = message;
+    service.onMessage(destination, data, nonce);
+  });
 }
