@@ -59,9 +59,14 @@ export class SimpleLogger extends Logger {
   protected static readonly yamlDumpOptions: DumpOptions = {
     lineWidth: 120,
     quotingType: '"',
+    skipInvalid: true,
     replacer: (_, value: any) => {
       if (!(value instanceof Error)) {
-        return typeof value === 'function' ? value.toString() : value;
+        if (typeof value === 'function' || typeof value === 'bigint') {
+          return value.toString();
+        } else {
+          return value;
+        }
       }
 
       const error: any = {};
