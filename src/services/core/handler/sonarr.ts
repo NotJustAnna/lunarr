@@ -11,9 +11,6 @@ import { SonarrEpisodeState } from '../../../database/enums/sonarrEpisodeState';
 export class SonarrHandler {
   private static readonly logger = createLogger('SonarrHandler');
 
-  private readonly url = process.env.SONARR_URL!;
-  private readonly apiKey = process.env.SONARR_API_KEY!;
-
   private showRepository: Repository<Show>;
   private seasonRepository: Repository<ShowSeason>;
   private episodeRepository: Repository<ShowEpisode>;
@@ -84,7 +81,7 @@ export class SonarrHandler {
         newEpisode.title = sonarrEpisode.title;
         newEpisode.sonarrId = String(sonarrEpisode.id);
         newEpisode.sonarrState = sonarrEpisode.monitored ?
-          (sonarrEpisode.hasFile ? SonarrEpisodeState.IMPORTED : SonarrEpisodeState.MONITORED)
+          (sonarrEpisode.hasFile ? SonarrEpisodeState.AVAILABLE : SonarrEpisodeState.MONITORED)
           : SonarrEpisodeState.UNMONITORED;
         await this.episodeRepository.save(newEpisode);
         continue;

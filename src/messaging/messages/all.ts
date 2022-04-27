@@ -9,4 +9,4 @@
 
 export { ErrorMessage, EmptyReply, EmptyMessage } from './index';
 export * from './services';
-export * from './syncSonarr';
+export * from './sync';
