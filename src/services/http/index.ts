@@ -9,6 +9,7 @@ export class FlixHttp implements Service {
   constructor() {
     const app: Express = express();
     const port = Number(process.env.HTTP_PORT);
+    app.use(express.static('public'));
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
     app.use(express.text({
