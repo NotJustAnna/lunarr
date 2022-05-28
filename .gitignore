@@ -1,4 +1,4 @@
-.yarn/*
+/.yarn/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
@@ -13,6 +13,7 @@
 /.idea/
 /.vscode/
 /.env
+/public/
 
 scripts/raw_logs/
 scripts/merged/
