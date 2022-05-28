@@ -3,4 +3,4 @@ import { startApp } from './utils/init/mainThread';
 
 // startApp('core');
 
-startApp('discord', 'http');
+startApp('discord', 'http', 'core');

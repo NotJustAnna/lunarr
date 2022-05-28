@@ -34,3 +34,14 @@ export class ErrorMessage extends Message {
     }
   }
 }
+
+export class ErrorReply extends Reply {
+  error!: any;
+
+  constructor(props?: Omit<ErrorReply, 'id'>) {
+    super();
+    if (props) {
+      Object.assign(this, props);
+    }
+  }
+}

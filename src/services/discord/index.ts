@@ -4,15 +4,15 @@ import * as console from 'console';
 import { Service } from '../../utils/init/worker';
 import { createLogger } from '../../utils/logger';
 import { MessageTransport } from '../../messaging/transport';
-import { PostOffice } from '../../messaging/postOffice';
+import { DiscordPostOffice } from './postOffice';
 
 export class FlixDiscord implements Service {
   private static readonly logger = createLogger('FlixDiscord');
   private client: Client<true>;
-  private postOffice: PostOffice;
+  private postOffice: DiscordPostOffice;
 
   constructor(transport: MessageTransport) {
-    this.postOffice = new PostOffice(transport);
+    this.postOffice = new DiscordPostOffice(transport);
 
     this.postOffice.startServices([{
       name: 'discord/deploy-commands', file: 'discord/tasks/deploy-commands.js',
@@ -32,11 +32,22 @@ export class FlixDiscord implements Service {
           FlixDiscord.logger.info(`Received command`, { interaction });
 
           const subcommand = interaction.options.getSubcommand();
+          if (subcommand === 'auth') {
+            const link = await this.postOffice.initFlatAssocFlow(interaction.user.id);
+
+            await interaction.reply({
+              content: `Please visit ${link} to associate your account with a OMBI account.`,
+              ephemeral: true,
+            });
+
+            return;
+          }
 
           await interaction.reply({
             content: `Hello ${subcommand}!`,
             ephemeral: true,
           });
+
         }
         return;
       }

@@ -7,6 +7,7 @@
  *
  */
 
-export { ErrorMessage, EmptyReply, EmptyMessage } from './index';
+export { ErrorMessage, ErrorReply, EmptyReply, EmptyMessage } from './index';
 export * from './services';
 export * from './sync';
+export * from './flatAssoc';

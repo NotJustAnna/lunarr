@@ -3,7 +3,6 @@ import { SonarrHandler } from './handler/sonarr';
 import { createLogger } from '../../utils/logger';
 import { FlixDataSource } from '../../database';
 import { MessageTransport } from '../../messaging/transport';
-import { PostOffice } from '../../messaging/postOffice';
 import {
   OmbiMovieSyncMessage,
   OmbiTvSyncMessage,
@@ -14,20 +13,27 @@ import { Result } from '../../messaging/packet/types';
 import { RadarrHandler } from './handler/radarr';
 import { OmbiMovieHandler } from './handler/ombiMovie';
 import { OmbiTvHandler } from './handler/ombiTv';
+import { CorePostOffice } from './postOffice';
+import { UserHandler } from './handler/user';
+import { InitFlatAssocMessage, InitFlatAssocReply } from '../../messaging/messages/flatAssoc';
+import { ErrorReply } from '../../messaging/messages';
+import { localGenerator } from 'nanoflakes';
 
 export class FlixCore implements Service, ServiceInit {
   private static readonly logger = createLogger('FlixCore');
 
   private readonly database = FlixDataSource;
-  private readonly postOffice: PostOffice;
+  private readonly postOffice: CorePostOffice;
+  private readonly nanoflakes = localGenerator(1653700000000, 0);
 
   private readonly sonarrHandler = new SonarrHandler(this.database);
   private readonly radarrHandler = new RadarrHandler(this.database);
   private readonly ombiMovieHandler = new OmbiMovieHandler(this.database);
   private readonly ombiTvHandler = new OmbiTvHandler(this.database);
+  private readonly userHandler = new UserHandler(this.database, this.nanoflakes);
 
   constructor(transport: MessageTransport) {
-    this.postOffice = new PostOffice(transport);
+    this.postOffice = new CorePostOffice(transport);
     this.postOffice.ofType(SonarrSyncMessage, (_, { episodes, series }) => {
       this.sonarrHandler.sync(series, episodes).catch(error => {
         FlixCore.logger.error('Error while syncing Sonarr data', { error });
@@ -52,10 +58,22 @@ export class FlixCore implements Service, ServiceInit {
       });
       return Result.Continue;
     });
+    this.postOffice.ofType(InitFlatAssocMessage, (from, { id, discordUserId }) => {
+      try {
+        const link = this.userHandler.initFlatAssoc(discordUserId);
+        this.postOffice.send(from, new InitFlatAssocReply({ replyTo: id, link }));
+      } catch (error) {
+        FlixCore.logger.error('Error while initializing FLAT-based association flow', { error });
+        this.postOffice.send(from, new ErrorReply({ replyTo: id, error }));
+      }
+      return Result.Continue;
+    });
   }
 
   async init() {
     await this.database.initialize();
+
+    return; // FIXME Added for testing
 
     const showsPromise = this.postOffice.awaitServiceStop('core/sync-sonarr').then(() => {
       const promise = this.postOffice.awaitServiceStop('core/sync-ombi-tv');

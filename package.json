@@ -17,6 +17,7 @@
     "express": "^4.17.3",
     "fs-extra": "^10.1.0",
     "js-yaml": "^4.1.0",
+    "nanoflakes": "^1.0.2",
     "pg": "^8.7.3",
     "reflect-metadata": "^0.1.13",
     "source-map-support": "^0.5.21",
