@@ -1132,6 +1132,7 @@ __metadata:
     express: ^4.17.3
     fs-extra: ^10.1.0
     js-yaml: ^4.1.0
+    nanoflakes: ^1.0.2
     pg: ^8.7.3
     reflect-metadata: ^0.1.13
     rimraf: ^3.0.2
@@ -1926,6 +1927,13 @@ __metadata:
   dependencies:
     node-gyp: latest
   checksum: 33e1bb4dfca447fe37d4bb5889be55de154828632c8d38646db67293a21afd61ed9909cdf1b886214a64707d935926c4e60e2b09de9edfc2ad58de31d6ce8f39
+  languageName: node
+  linkType: hard
+
+"nanoflakes@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "nanoflakes@npm:1.0.2"
+  checksum: 90e466517c4b2f59488a3e23afec9a6104d7eff109f9bf2fd01ca59934b5a0218c1a76189a9892c7b36eb9ca437bbe4a3b054feada041ca8a564f179f893287a
   languageName: node
   linkType: hard
 
