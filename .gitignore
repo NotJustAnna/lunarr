@@ -13,3 +13,7 @@
 /.idea/
 /.vscode/
 /.env
+
+scripts/raw_logs/
+scripts/merged/
+scripts/lookup/
