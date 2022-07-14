@@ -1,21 +1,23 @@
 import { createLogger } from '../../../utils/logger';
-import { DataSource, Repository } from 'typeorm';
-import { Show } from '../../../database/entity/Show';
-import { ShowSeason } from '../../../database/entity/ShowSeason';
-import { ShowEpisode } from '../../../database/entity/ShowEpisode';
 import { TvRequest } from '../../../types/ombi/api/GetTvRequests';
+import { PrismaClient } from '../../../generated/prisma-client';
+import { CorePostOffice } from '../postOffice';
+import { OmbiMovieSyncMessage, OmbiTvSyncMessage } from '../../../messaging/messages/sync';
+import { Result } from '../../../messaging/packet/types';
 
 export class OmbiTvHandler {
   private static readonly logger = createLogger('OmbiTvHandler');
 
-  private showRepository: Repository<Show>;
-  private seasonRepository: Repository<ShowSeason>;
-  private episodeRepository: Repository<ShowEpisode>;
-
-  constructor(private readonly database: DataSource) {
-    this.showRepository = this.database.getRepository(Show);
-    this.seasonRepository = this.database.getRepository(ShowSeason);
-    this.episodeRepository = this.database.getRepository(ShowEpisode);
+  constructor(
+    private readonly client: PrismaClient,
+    private readonly postOffice: CorePostOffice,
+  ) {
+    this.postOffice.ofType(OmbiTvSyncMessage, (_, { requests }) => {
+      this.sync(requests).catch(error => {
+        OmbiTvHandler.logger.error('Error while syncing Ombi tv data', { error });
+      });
+      return Result.Continue;
+    });
   }
 
   async sync(requests: TvRequest[]) {

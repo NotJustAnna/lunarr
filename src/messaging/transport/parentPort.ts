@@ -1,6 +1,6 @@
 import { parentPort } from '../../utils/workers';
 import { MessageTransport } from './index';
-import { IncomingPacket, OutgoingPacket } from '../packet';
+import { MessagePacket } from '../packet';
 import { MessagePort } from 'worker_threads';
 import { instanceToPlain, plainToInstance } from 'class-transformer';
 import { createLogger } from '../../utils/logger';
@@ -22,21 +22,21 @@ export class ParentPortTransport implements MessageTransport {
     if (!this.setup && callback) {
       this.setup = true;
       this.port.on('message', (message: any) => {
-        let incomingPacket: IncomingPacket;
+        let packet: MessagePacket;
         try {
-          incomingPacket = plainToInstance(IncomingPacket, message as object);
+          packet = plainToInstance(MessagePacket, message as object);
         } catch (error) {
           ParentPortTransport.logger.error(`Failed to parse incoming packet`, { error, message });
           return;
         }
         if (this.callback) {
-          this.callback(incomingPacket.sender, incomingPacket.message);
+          this.callback(packet.name, packet.message);
         }
       });
     }
   }
 
   send(name: string, message: Message) {
-    this.port.postMessage(instanceToPlain(new OutgoingPacket({ recipient: name, message })));
+    this.port.postMessage(instanceToPlain(new MessagePacket({ name, message })));
   }
 }

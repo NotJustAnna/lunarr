@@ -14,6 +14,12 @@ export class FlixDiscord implements Service {
   constructor(transport: MessageTransport) {
     this.postOffice = new DiscordPostOffice(transport);
 
+    const discordToken = process.env.DISCORD_TOKEN;
+    if (!discordToken) {
+      FlixDiscord.logger.error('DISCORD_TOKEN environment variable is not set');
+      throw new Error('DISCORD_TOKEN environment variable is not set');
+    }
+
     this.postOffice.startServices([{
       name: 'discord/deploy-commands', file: 'discord/tasks/deploy-commands.js',
     }]);
@@ -53,6 +59,6 @@ export class FlixDiscord implements Service {
       }
     });
 
-    this.client.login(process.env.DISCORD_TOKEN).catch(console.error);
+    this.client.login(discordToken).catch(console.error);
   }
 }

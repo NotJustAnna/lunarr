@@ -13,7 +13,7 @@ import {
   StopServiceMessage,
   WhoAmIReply,
 } from '../../messaging/messages/services';
-import { ErrorMessage } from '../../messaging/messages';
+import { ErrorMessage, LogMessage } from '../../messaging/messages';
 import { ExitCode, exitCodeMeanings } from './exitCode';
 
 export function startApp(...services: ServiceStart[]) {
@@ -51,6 +51,13 @@ class ServiceManager {
         replyTo: message.id, services: Object.keys(this.workers),
       }));
     });
+    this.postExchange.registerEndpoint('@log', (sender, message) => {
+      if (message instanceof LogMessage) {
+        console.log(message.message);
+      } else {
+        ServiceManager.logger.error(`Received "@log" from "${sender}" but message is not LogMessage`, { message });
+      }
+    });
     this.postExchange.registerEndpoint('@error', (sender, message) => {
       if (message instanceof ErrorMessage) {
         ServiceManager.handleError(sender, message);
@@ -79,6 +86,9 @@ class ServiceManager {
   }
 
   private static handleError(source: string, error: any) {
+    if (error.id && error.error) {
+      error = error.error;
+    }
     ServiceManager.logger.error(`Error received from service "${source}"`, { source, error });
   }
 
@@ -111,6 +121,11 @@ class ServiceManager {
         code === ExitCode.SUCCESS ? 'info' : 'error',
         `Worker "${name}" ${exitCodeMeanings[code] ?? `exited with code ${code}`}`,
       );
+
+      if (Object.keys(this.workers).length === 0) {
+        ServiceManager.logger.info('No services running. Exiting...');
+        process.exit(code);
+      }
     });
     this.postExchange.sendMessage('@start', '@all', new ServiceStartedMessage({
       serviceName: name,

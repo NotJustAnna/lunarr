@@ -3,7 +3,7 @@ import { Message } from '../messages';
 import { Type } from 'class-transformer';
 import * as allMessages from '../messages/all';
 
-export abstract class MessagePacket {
+export class MessagePacket {
   @Type(() => Message, {
     discriminator: {
       property: '_type',
@@ -13,24 +13,9 @@ export abstract class MessagePacket {
     },
   })
   message!: Message;
-}
+  name!: string;
 
-export class IncomingPacket extends MessagePacket {
-  sender!: string;
-
-  constructor(props?: IncomingPacket) {
-    super();
-    if (props) {
-      Object.assign(this, props);
-    }
-  }
-}
-
-export class OutgoingPacket extends MessagePacket {
-  recipient!: string;
-
-  constructor(props?: OutgoingPacket) {
-    super();
+  constructor(props?: MessagePacket) {
     if (props) {
       Object.assign(this, props);
     }

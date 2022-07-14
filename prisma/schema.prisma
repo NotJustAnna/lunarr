@@ -1,0 +1,219 @@
+generator client {
+  provider = "prisma-client-js"
+  output = "../src/generated/prisma-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Movie {
+  id              String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @map("movi_id")
+  createdAt       DateTime          @default(now()) @db.Timestamp(6) @map("movi_created_at")
+
+  title           String?           @map("movi_title")
+
+  jellyfinId      String?           @unique() @map("movi_jellyfin_id")
+  radarrId        String?           @unique() @map("movi_radarr_id")
+  ombiRequestId   String?           @unique() @map("movi_ombi_request_id")
+  tmdbId          String?           @unique() @map("movi_tmdb_id")
+  imdbId          String?           @unique() @map("movi_imdb_id")
+
+  jellyfinState   JellyfinDataState @default(NONE) @map("movi_jellyfin_state")
+  radarrState     RadarrDataState   @default(NONE) @map("movi_radarr_state")
+
+  videoTracks     MovieVideoTrack[]
+  audioTracks     MovieAudioTrack[]
+  subtitleTracks  MovieSubtitleTrack[]
+}
+
+model MovieAudioTrack {
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @map("moat_id")
+  createdAt   DateTime  @default(now()) @db.Timestamp(6) @map("moat_created_at")
+
+  title       String    @map("moat_title")
+  codec       String    @map("moat_codec")
+  language    String    @map("moat_language")
+  channels    String    @map("moat_channels")
+  bitrate     String    @map("moat_bitrate")
+  sampleRate  String    @map("moat_sample_rate")
+
+  movieId     String    @db.Uuid @map("movi_id")
+  movie       Movie     @relation(fields: [movieId], references: [id])
+}
+
+model MovieVideoTrack {
+  id            String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @map("movt_id")
+  createdAt     DateTime  @default(now()) @db.Timestamp(6) @map("movt_created_at")
+
+  title         String    @map("movt_title")
+  aspectRatio   String    @map("movt_aspect_ratio")
+  codec         String    @map("movt_codec")
+  colorSpace    String    @map("movt_color_space")
+  interlaced    Boolean   @map("movt_interlaced")
+  height        String    @map("movt_height")
+  width         String    @map("movt_width")
+  range         String    @map("movt_range")
+
+  movieId       String    @db.Uuid @map("movi_id")
+  movie         Movie     @relation(fields: [movieId], references: [id])
+}
+
+model MovieSubtitleTrack {
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @map("most_id")
+  createdAt   DateTime  @default(now()) @db.Timestamp(6) @map("most_created_at")
+
+  title       String    @map("most_title")
+  codec       String    @map("most_codec")
+  language    String    @map("most_language")
+  external    Boolean   @map("most_external")
+  forced      Boolean   @map("most_forced")
+
+  movieId     String    @db.Uuid @map("movi_id")
+  movie       Movie     @relation(fields: [movieId], references: [id])
+}
+
+model Show {
+  id              String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @map("show_id")
+  createdAt       DateTime          @default(now()) @db.Timestamp(6) @map("show_created_at")
+
+  title           String?           @map("show_title")
+
+  jellyfinId      String?           @unique() @map("show_jellyfin_id")
+  sonarrId        String?           @unique() @map("show_sonarr_id")
+  ombiRequestId   String?           @unique() @map("show_ombi_request_id")
+  tvdbId          String?           @unique() @map("show_tvdb_id")
+  tvRageId        String?           @unique() @map("show_tvrage_id")
+  tvMazeId        String?           @unique() @map("show_tvmaze_id")
+
+  jellyfinState   JellyfinDataState @default(NONE) @map("show_jellyfin_state")
+  sonarrState     SonarrDataState   @default(NONE) @map("show_sonarr_state")
+
+  seasons         ShowSeason[]
+}
+
+model ShowSeason {
+  id              String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @map("shse_id")
+  number          Int               @map("shse_number")
+  createdAt       DateTime          @default(now()) @db.Timestamp(6) @map("shse_created_at")
+
+  jellyfinId      String?           @unique() @map("shse_jellyfin_id")
+
+  jellyfinState   JellyfinDataState @default(NONE) @map("shse_jellyfin_state")
+  sonarrState     SonarrDataState   @default(NONE) @map("shse_sonarr_state")
+
+  showId          String            @db.Uuid @map("show_id")
+  show            Show              @relation(fields: [showId], references: [id])
+  episodes        ShowEpisode[]
+
+  @@unique([showId, number])
+}
+
+model ShowEpisode {
+  id                    String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @map("shep_id")
+  number                Int                     @map("shep_number")
+  createdAt             DateTime                @default(now()) @db.Timestamp(6) @map("shep_created_at")
+
+  title                 String?                 @map("show_title")
+
+  jellyfinId            String?                 @unique() @map("shep_jellyfin_id")
+  sonarrId              String?                 @unique() @map("shep_sonarr_id")
+
+  jellyfinState         JellyfinDataState       @default(NONE) @map("shep_jellyfin_state")
+  sonarrState           SonarrEpisodeDataState  @default(NONE) @map("shep_sonarr_state")
+  ombiRequestState      OmbiRequestDataState    @default(NONE) @map("shep_ombi_request_state")
+
+  seasonId              String                  @db.Uuid @map("shse_id")
+  season                ShowSeason              @relation(fields: [seasonId], references: [id])
+  episodeAudioTrack     EpisodeAudioTrack[]
+  episodeSubtitleTrack  EpisodeSubtitleTrack[]
+  episodeVideoTrack     EpisodeVideoTrack[]
+
+  @@unique([seasonId, number])
+}
+
+model EpisodeAudioTrack {
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @map("epat_id")
+  createdAt   DateTime  @default(now()) @db.Timestamp(6) @map("epat_created_at")
+
+  title       String    @map("epat_title")
+  codec       String    @map("epat_codec")
+  language    String    @map("epat_language")
+  channels    String    @map("epat_channels")
+  bitrate     String    @map("epat_bitrate")
+  sampleRate  String    @map("epat_sample_rate")
+
+  episodeId   String    @db.Uuid @map("shep_id")
+  episode     ShowEpisode   @relation(fields: [episodeId], references: [id])
+}
+
+model EpisodeVideoTrack {
+  id          String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @map("epvt_id")
+  createdAt   DateTime    @default(now()) @db.Timestamp(6) @map("epvt_created_at")
+
+  title       String      @map("epvt_title")
+  aspectRatio String      @map("epvt_aspect_ration")
+  codec       String      @map("epvt_codec")
+  colorSpace  String      @map("epvt_color_space")
+  interlaced  Boolean     @map("epvt_interlaced")
+  height      String      @map("epvt_height")
+  width       String      @map("epvt_width")
+  range       String      @map("epvt_range")
+
+  episodeId   String      @db.Uuid @map("shep_id")
+  episode     ShowEpisode @relation(fields: [episodeId], references: [id])
+}
+
+model EpisodeSubtitleTrack {
+  id          String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @map("epst_id")
+  createdAt   DateTime    @default(now()) @db.Timestamp(6) @map("epst_created_at")
+
+  title       String      @map("epst_title")
+  codec       String      @map("epst_codec")
+  language    String      @map("epst_language")
+  external    Boolean     @map("epst_external")
+  forced      Boolean     @map("epst_forced")
+
+  episodeId   String      @db.Uuid @map("shep_id")
+  episode     ShowEpisode @relation(fields: [episodeId], references: [id])
+}
+
+enum JellyfinDataState {
+  NONE
+  UNAVAILABLE
+  AVAILABLE
+}
+
+enum RadarrDataState {
+  NONE
+  UNMONITORED
+  MONITORED
+  GRABBED
+  AVAILABLE
+  REMOVED
+}
+
+enum SonarrDataState {
+  NONE
+  UNMONITORED
+  MONITORED
+}
+
+enum SonarrEpisodeDataState {
+  NONE
+  UNMONITORED
+  MONITORED
+  GRABBED
+  AVAILABLE
+  REMOVED
+}
+
+enum OmbiRequestDataState {
+  NONE
+  AWAITING_APPROVAL
+  APPROVED_REQUEST
+  DECLINED_REQUEST
+  PARTIALLY_AVAILABLE
+  AVAILABLE
+}

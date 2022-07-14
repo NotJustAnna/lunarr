@@ -1,16 +1,23 @@
 import { createLogger } from '../../../utils/logger';
-import { DataSource, Repository } from 'typeorm';
-import { Movie } from '../../../database/entity/Movie';
 import { RadarrMovie } from '../../../types/radarr/api/RadarrMovie';
-import { RadarrState } from '../../../database/enums/radarrState';
+import { PrismaClient, RadarrDataState } from '../../../generated/prisma-client';
+import { CorePostOffice } from '../postOffice';
+import { RadarrSyncMessage } from '../../../messaging/messages/sync';
+import { Result } from '../../../messaging/packet/types';
 
 export class RadarrHandler {
   private static readonly logger = createLogger('RadarrHandler');
 
-  private movieRepository: Repository<Movie>;
-
-  constructor(private readonly database: DataSource) {
-    this.movieRepository = this.database.getRepository(Movie);
+  constructor(
+    private readonly client: PrismaClient,
+    private readonly postOffice: CorePostOffice,
+  ) {
+    this.postOffice.ofType(RadarrSyncMessage, (_, { movies }) => {
+      this.sync(movies).catch(error => {
+        RadarrHandler.logger.error('Error while syncing Radarr data', { error });
+      });
+      return Result.Continue;
+    });
   }
 
   async sync(movies: RadarrMovie[]) {
@@ -18,28 +25,28 @@ export class RadarrHandler {
   }
 
   private async createOrUpdateMovie(m: RadarrMovie) {
-    const movie = await this.movieRepository.findOne({
-      where: [
-        { radarrId: String(m.id) },
-        { tmdbId: String(m.tmdbId) },
-        { imdbId: m.imdbId },
-      ],
+    const movie = await this.client.movie.findFirst({
+      where: {
+        OR: [
+          { radarrId: String(m.id) },
+          { tmdbId: String(m.tmdbId) },
+          { imdbId: m.imdbId },
+        ],
+      },
     });
 
     if (!movie) {
-      const newMovie = new Movie();
-      newMovie.radarrId = String(m.id);
-      if (m.tmdbId && m.tmdbId !== 0) {
-        newMovie.tmdbId = String(m.tmdbId);
-      }
-      if (m.imdbId && m.imdbId !== '0') {
-        newMovie.imdbId = m.imdbId;
-      }
-      newMovie.title = m.title;
-      newMovie.radarrState = m.monitored ?
-        (m.hasFile ? RadarrState.AVAILABLE : RadarrState.MONITORED)
-        : RadarrState.UNMONITORED;
-      await this.movieRepository.save(newMovie);
+      await this.client.movie.create({
+        data: {
+          radarrId: String(m.id),
+          tmdbId: (m.tmdbId && m.tmdbId !== 0) ? String(m.tmdbId) : null,
+          imdbId: (m.imdbId && m.imdbId !== '0') ? m.imdbId : null,
+          title: m.title,
+          radarrState: m.monitored ?
+            (m.hasFile ? RadarrDataState.AVAILABLE : RadarrDataState.MONITORED)
+            : RadarrDataState.UNMONITORED,
+        },
+      });
       return;
     }
 
