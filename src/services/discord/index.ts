@@ -5,6 +5,7 @@ import { Service } from '../../utils/init/worker';
 import { createLogger } from '../../utils/logger';
 import { MessageTransport } from '../../messaging/transport';
 import { DiscordPostOffice } from './postOffice';
+import { ExitCode } from '../../utils/init/exitCode';
 
 export class FlixDiscord implements Service {
   private static readonly logger = createLogger('FlixDiscord');
@@ -17,7 +18,8 @@ export class FlixDiscord implements Service {
     const discordToken = process.env.DISCORD_TOKEN;
     if (!discordToken) {
       FlixDiscord.logger.error('DISCORD_TOKEN environment variable is not set');
-      throw new Error('DISCORD_TOKEN environment variable is not set');
+      process.exit(ExitCode.CONFIGURATION_ERROR);
+      throw new Error('Assertion Error');
     }
 
     this.postOffice.startServices([{

@@ -2,12 +2,9 @@ import { createLogger } from '../logger';
 import 'dotenv/config';
 import { ParentPortTransport } from '../../messaging/transport/parentPort';
 import { MessageTransport } from '../../messaging/transport';
-import { ErrorMessage, LogMessage } from '../../messaging/messages';
+import { ErrorMessage } from '../../messaging/messages';
 import * as process from 'process';
 import { ExitCode } from './exitCode';
-import { SimpleLogger } from '../logger/SimpleLogger';
-
-export type MessageSender = (destination: string, data: any, nonce?: any) => void;
 
 export interface Service {
 }
@@ -21,18 +18,13 @@ function hasInit(service: Service | ServiceInit): service is ServiceInit {
 }
 
 export function startService(ServiceImpl: new (transport: MessageTransport) => Service) {
-  const transport = new ParentPortTransport();
-  // setupLoggingTunneling(transport);
+  const transport = new ParentPortTransport(true);
   asyncStart(transport, ServiceImpl).catch(error => {
     const logger = createLogger(ServiceImpl.name);
     logger.error('Error while initializing service', { error });
     transport.send('@error', new ErrorMessage(error));
     process.exit(ExitCode.SOFTWARE_ERROR);
   });
-}
-
-export function setupLoggingTunneling(transport: MessageTransport) {
-  SimpleLogger.stdout = arg => transport.send('@log', new LogMessage(arg));
 }
 
 async function asyncStart(transport: MessageTransport, ServiceImpl: new (transport: MessageTransport) => Service) {

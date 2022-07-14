@@ -34,11 +34,14 @@ export class FlixCore implements Service, ServiceInit {
   }
 
   async init() {
-    return; // FIXME Added for testing
-
     await this.postOffice.runServices([
       { name: 'core/sync-sonarr', file: 'core/tasks/sync-sonarr.js' },
       { name: 'core/sync-radarr', file: 'core/tasks/sync-radarr.js' },
+    ]);
+
+    await this.postOffice.runServices([
+      { name: 'core/sync-ombi-movies', file: 'core/tasks/sync-ombi-movies.js' },
+      { name: 'core/sync-ombi-tv', file: 'core/tasks/sync-ombi-tv.js' },
     ]);
 
     await this.postOffice.runServices([

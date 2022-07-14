@@ -9,11 +9,19 @@ import axios from 'axios';
 import { OmbiTvSyncMessage } from '../../../messaging/messages/sync';
 import { TvRequest } from '../../../types/ombi/api/GetTvRequests';
 
-const url = process.env.OMBI_URL!;
-const apiKey = process.env.OMBI_API_KEY!;
-
 const logger = createLogger('Task "Sync Ombi TV"');
-const postOffice = new PostOffice(new ParentPortTransport());
+const postOffice = new PostOffice(new ParentPortTransport(true));
+
+const url = process.env.OMBI_URL!;
+if (!url) {
+  logger.error('OMBI_URL environment variable is not set!');
+  process.exit(ExitCode.CONFIGURATION_ERROR);
+}
+const apiKey = process.env.OMBI_API_KEY!;
+if (!apiKey) {
+  logger.error('OMBI_API_KEY environment variable is not set!');
+  process.exit(ExitCode.CONFIGURATION_ERROR);
+}
 
 async function main() {
   logger.info('Syncing TV requests...');
