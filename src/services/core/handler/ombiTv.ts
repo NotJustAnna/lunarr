@@ -2,7 +2,7 @@ import { createLogger } from '../../../utils/logger';
 import { TvRequest } from '../../../types/ombi/api/GetTvRequests';
 import { PrismaClient } from '../../../generated/prisma-client';
 import { CorePostOffice } from '../postOffice';
-import { OmbiMovieSyncMessage, OmbiTvSyncMessage } from '../../../messaging/messages/sync';
+import { OmbiTvSyncMessage } from '../../../messaging/messages/sync';
 import { Result } from '../../../messaging/packet/types';
 
 export class OmbiTvHandler {

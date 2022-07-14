@@ -9,11 +9,19 @@ import axios from 'axios';
 import { OmbiMovieSyncMessage } from '../../../messaging/messages/sync';
 import { MovieRequest } from '../../../types/ombi/api/GetMovieRequests';
 
-const url = process.env.OMBI_URL!;
-const apiKey = process.env.OMBI_API_KEY!;
-
 const logger = createLogger('Task "Sync Ombi Movies"');
-const postOffice = new PostOffice(new ParentPortTransport());
+const postOffice = new PostOffice(new ParentPortTransport(true));
+
+const url = process.env.OMBI_URL!;
+if (!url) {
+  logger.error('OMBI_URL environment variable is not set!');
+  process.exit(ExitCode.CONFIGURATION_ERROR);
+}
+const apiKey = process.env.OMBI_API_KEY!;
+if (!apiKey) {
+  logger.error('OMBI_API_KEY environment variable is not set!');
+  process.exit(ExitCode.CONFIGURATION_ERROR);
+}
 
 async function main() {
   logger.info('Syncing Movie requests...');

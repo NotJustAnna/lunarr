@@ -3,13 +3,21 @@ import { Express, Request, Response } from 'express-serve-static-core';
 import { createLogger } from '../../utils/logger';
 import { Service } from '../../utils/init/worker';
 import * as process from 'process';
+import { ExitCode } from '../../utils/init/exitCode';
 
 export class FlixHttp implements Service {
   private static readonly logger = createLogger('FlixHttp');
 
   constructor() {
     const app: Express = express();
+    if (!process.env.HTTP_PORT) {
+      FlixHttp.logger.error('HTTP_PORT environment variable is not set');
+      process.exit(ExitCode.CONFIGURATION_ERROR);
+      throw new Error('Assertion Error');
+    }
+
     const port = Number(process.env.HTTP_PORT);
+
     app.use(express.static('public'));
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));

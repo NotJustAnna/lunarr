@@ -9,11 +9,19 @@ import axios from 'axios';
 import { RadarrMovie } from '../../../types/radarr/api/RadarrMovie';
 import { RadarrSyncMessage } from '../../../messaging/messages/sync';
 
-const url = process.env.RADARR_URL!;
-const apiKey = process.env.RADARR_API_KEY!;
-
 const logger = createLogger('Task "Sync Radarr"');
-const postOffice = new PostOffice(new ParentPortTransport());
+const postOffice = new PostOffice(new ParentPortTransport(true));
+
+const url = process.env.RADARR_URL!;
+if (!url) {
+  logger.error('RADARR_URL environment variable is not set!');
+  process.exit(ExitCode.CONFIGURATION_ERROR);
+}
+const apiKey = process.env.RADARR_API_KEY!;
+if (!apiKey) {
+  logger.error('RADARR_API_KEY environment variable is not set!');
+  process.exit(ExitCode.CONFIGURATION_ERROR);
+}
 
 async function main() {
   logger.info('Syncing Movies...');

@@ -4,7 +4,8 @@ import { MessagePacket } from '../packet';
 import { MessagePort } from 'worker_threads';
 import { instanceToPlain, plainToInstance } from 'class-transformer';
 import { createLogger } from '../../utils/logger';
-import { Message } from '../messages';
+import { LogMessage, Message } from '../messages';
+import { SimpleLogger } from '../../utils/logger/SimpleLogger';
 
 export class ParentPortTransport implements MessageTransport {
   private static readonly logger = createLogger('ParentPortMessageTransport');
@@ -13,8 +14,11 @@ export class ParentPortTransport implements MessageTransport {
   private callback?: (name: string, message: Message) => void;
   private setup = false;
 
-  constructor() {
+  constructor(forwardLogs?: boolean) {
     this.port = parentPort(ParentPortTransport.logger);
+    if (forwardLogs) {
+      SimpleLogger.stdout = arg => this.send('@log', new LogMessage(arg));
+    }
   }
 
   onMessage(callback?: (name: string, message: Message) => void) {

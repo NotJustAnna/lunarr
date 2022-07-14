@@ -10,11 +10,19 @@ import * as process from 'process';
 import { ExitCode } from '../../../utils/init/exitCode';
 import { attempt } from '../../../utils/attempt';
 
-const url = process.env.SONARR_URL!;
-const apiKey = process.env.SONARR_API_KEY!;
-
 const logger = createLogger('Task "Sync Sonarr"');
-const postOffice = new PostOffice(new ParentPortTransport());
+const postOffice = new PostOffice(new ParentPortTransport(true));
+
+const url = process.env.SONARR_URL!;
+if (!url) {
+  logger.error('SONARR_URL environment variable is not set!');
+  process.exit(ExitCode.CONFIGURATION_ERROR);
+}
+const apiKey = process.env.SONARR_API_KEY!;
+if (!apiKey) {
+  logger.error('SONARR_API_KEY environment variable is not set!');
+  process.exit(ExitCode.CONFIGURATION_ERROR);
+}
 
 async function main() {
   logger.info('Syncing Series...');
