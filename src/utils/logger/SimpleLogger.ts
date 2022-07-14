@@ -77,12 +77,5 @@ export class SimpleLogger extends Logger {
     },
   };
 
-  private static stdout: (arg: string) => void = defaultStdout;
-
-  public static bypassJest<T>(fn: () => T): T {
-    this.stdout = bypassStdout;
-    const t = fn();
-    this.stdout = defaultStdout;
-    return t;
-  }
+  public static stdout: (arg: string) => void = defaultStdout;
 }

@@ -1,14 +1,32 @@
 import { createLogger } from '../../../utils/logger';
-import { DataSource } from 'typeorm';
 import { NanoflakeLocalGenerator } from 'nanoflakes';
 import * as process from 'process';
+import { PrismaClient } from '../../../generated/prisma-client';
+import { CorePostOffice } from '../postOffice';
+import { InitFlatAssocMessage, InitFlatAssocReply } from '../../../messaging/messages/flatAssoc';
+import { ErrorReply } from '../../../messaging/messages';
+import { Result } from '../../../messaging/packet/types';
 
 export class UserHandler {
   private static readonly logger = createLogger('UserHandler');
 
   private inMemoryFlatAssocs: Record<string, string> = {};
 
-  constructor(private readonly database: DataSource, private readonly nanoflakes: NanoflakeLocalGenerator) {
+  constructor(
+    private readonly client: PrismaClient,
+    private readonly postOffice: CorePostOffice,
+    private readonly nanoflakes: NanoflakeLocalGenerator
+  ) {
+    this.postOffice.ofType(InitFlatAssocMessage, (from, { id, discordUserId }) => {
+      try {
+        const link = this.initFlatAssoc(discordUserId);
+        this.postOffice.send(from, new InitFlatAssocReply({ replyTo: id, link }));
+      } catch (error) {
+        UserHandler.logger.error('Error while initializing FLAT-based association flow', { error });
+        this.postOffice.send(from, new ErrorReply({ replyTo: id, error }));
+      }
+      return Result.Continue;
+    });
   }
 
   public initFlatAssoc(discordUserId: string): string {

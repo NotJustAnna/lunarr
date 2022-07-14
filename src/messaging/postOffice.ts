@@ -20,6 +20,12 @@ export class PostOffice {
 
   // shorthand methods
 
+  public runServices(services: ServiceStart[]) {
+    const promise = Promise.all(services.map(s => this.awaitServiceStop(typeof s === 'string' ? s : s.name)));
+    this.startServices(services);
+    return promise;
+  }
+
   public startServices(services: ServiceStart[]) {
     this.send('@start', new StartServiceMessage(services));
   }

@@ -24,6 +24,14 @@ export class EmptyReply extends Reply {
   }
 }
 
+export class LogMessage extends Message {
+  message!: string;
+  constructor(message: string) {
+    super();
+    this.message = message;
+  }
+}
+
 export class ErrorMessage extends Message {
   error!: any;
 
