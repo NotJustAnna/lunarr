@@ -9,23 +9,24 @@ datasource db {
 }
 
 model Movie {
-  id              String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @map("movi_id")
-  createdAt       DateTime          @default(now()) @db.Timestamp(6) @map("movi_created_at")
+  id                String                @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @map("movi_id")
+  createdAt         DateTime              @default(now()) @db.Timestamp(6) @map("movi_created_at")
 
-  title           String?           @map("movi_title")
+  title             String?               @map("movi_title")
 
-  jellyfinId      String?           @unique() @map("movi_jellyfin_id")
-  radarrId        String?           @unique() @map("movi_radarr_id")
-  ombiRequestId   String?           @unique() @map("movi_ombi_request_id")
-  tmdbId          String?           @unique() @map("movi_tmdb_id")
-  imdbId          String?           @unique() @map("movi_imdb_id")
+  jellyfinId        String?               @unique() @map("movi_jellyfin_id")
+  radarrId          String?               @unique() @map("movi_radarr_id")
+  ombiRequestId     String?               @unique() @map("movi_ombi_request_id")
+  tmdbId            String?               @unique() @map("movi_tmdb_id")
+  imdbId            String?               @unique() @map("movi_imdb_id")
 
-  jellyfinState   JellyfinDataState @default(NONE) @map("movi_jellyfin_state")
-  radarrState     RadarrDataState   @default(NONE) @map("movi_radarr_state")
+  jellyfinState     JellyfinDataState     @default(NONE) @map("movi_jellyfin_state")
+  radarrState       RadarrDataState       @default(NONE) @map("movi_radarr_state")
+  ombiRequestState  OmbiRequestDataState  @default(NONE) @map("movi_ombi_request_state")
 
-  videoTracks     MovieVideoTrack[]
-  audioTracks     MovieAudioTrack[]
-  subtitleTracks  MovieSubtitleTrack[]
+  videoTracks       MovieVideoTrack[]
+  audioTracks       MovieAudioTrack[]
+  subtitleTracks    MovieSubtitleTrack[]
 }
 
 model MovieAudioTrack {
@@ -211,9 +212,8 @@ enum SonarrEpisodeDataState {
 
 enum OmbiRequestDataState {
   NONE
-  AWAITING_APPROVAL
-  APPROVED_REQUEST
-  DECLINED_REQUEST
-  PARTIALLY_AVAILABLE
+  PENDING_APPROVAL
+  REQUEST_DENIED
+  PROCESSING_REQUEST
   AVAILABLE
 }
