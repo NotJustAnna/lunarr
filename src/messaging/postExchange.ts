@@ -9,12 +9,16 @@ export class PostExchange {
   private endpoints: Record<string, PacketConsumer> = {};
 
   registerTransport(name: string, transport: MessageTransport) {
-    if (name in this.transports) {
-      PostExchange.logger.warn(`Transport ${name} already registered.`);
+    if (name.length === 0) {
+      PostExchange.logger.warn(`Transport to be registered must not be empty.`);
       return;
     }
-    if (name.startsWith('@')) {
+    if (name[0] === '@') {
       PostExchange.logger.warn(`Transport ${name} cannot start with '@'.`);
+      return;
+    }
+    if (name in this.transports) {
+      PostExchange.logger.warn(`Transport ${name} already registered.`);
       return;
     }
     transport.onMessage((recipient, message) => this.sendMessage(name, recipient, message));
@@ -22,12 +26,16 @@ export class PostExchange {
   }
 
   registerEndpoint(name: string, endpoint: PacketConsumer) {
-    if (name in this.endpoints) {
-      PostExchange.logger.warn(`Endpoint ${name} already registered.`);
+    if (name.length === 0) {
+      PostExchange.logger.warn(`Endpoint to be registered must not be empty.`);
       return;
     }
-    if (!name.startsWith('@')) {
+    if (name[0] !== '@') {
       PostExchange.logger.warn(`Endpoint ${name} must start with '@'.`);
+      return;
+    }
+    if (name in this.endpoints) {
+      PostExchange.logger.warn(`Endpoint ${name} already registered.`);
       return;
     }
     this.endpoints[name] = endpoint;
@@ -42,7 +50,11 @@ export class PostExchange {
   }
 
   removeTransport(name: string) {
-    if (name.startsWith('@')) {
+    if (name.length === 0) {
+      PostExchange.logger.warn(`Transport to be registered must not be empty.`);
+      return;
+    }
+    if (name[0] === '@') {
       PostExchange.logger.warn(`Transport ${name} cannot start with '@'.`);
       return;
     }
@@ -55,7 +67,11 @@ export class PostExchange {
   }
 
   removeEndpoint(name: string) {
-    if (!name.startsWith('@')) {
+    if (name.length === 0) {
+      PostExchange.logger.warn(`Transport to be registered must not be empty.`);
+      return;
+    }
+    if (name[0] !== '@') {
       PostExchange.logger.warn(`Endpoint ${name} must start with '@'.`);
       return;
     }
@@ -67,7 +83,15 @@ export class PostExchange {
   }
 
   sendMessage(sender: string, recipient: string, message: Message) {
-    if (recipient.startsWith('@')) {
+    if (sender.length === 0) {
+      PostExchange.logger.warn(`Sender must not be empty.`);
+      return;
+    }
+    if (recipient.length === 0) {
+      PostExchange.logger.warn(`Recipient must not be empty.`);
+      return;
+    }
+    if (recipient[0] === '@') {
       if (recipient in this.endpoints) {
         this.endpoints[recipient](sender, message);
         return;

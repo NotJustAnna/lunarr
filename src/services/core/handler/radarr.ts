@@ -1,6 +1,6 @@
 import { createLogger } from '../../../utils/logger';
 import { RadarrMovie } from '../../../types/radarr/api/RadarrMovie';
-import { PrismaClient, RadarrDataState } from '../../../generated/prisma-client';
+import { Movie, PrismaClient, RadarrDataState } from '../../../generated/prisma-client';
 import { CorePostOffice } from '../postOffice';
 import { RadarrSyncMessage } from '../../../messaging/messages/sync';
 import { Result } from '../../../messaging/packet/types';
@@ -21,7 +21,8 @@ export class RadarrHandler {
   }
 
   async sync(movies: RadarrMovie[]) {
-    return Promise.all(movies.map(this.createOrUpdateMovie.bind(this)));
+    await Promise.all(movies.map(this.createOrUpdateMovie.bind(this)));
+    await this.findAndUpdateOldMovies(movies);
   }
 
   private async createOrUpdateMovie(m: RadarrMovie) {
@@ -35,21 +36,46 @@ export class RadarrHandler {
       },
     });
 
-    if (!movie) {
-      await this.client.movie.create({
-        data: {
-          radarrId: String(m.id),
-          tmdbId: (m.tmdbId && m.tmdbId !== 0) ? String(m.tmdbId) : null,
-          imdbId: (m.imdbId && m.imdbId !== '0') ? m.imdbId : null,
-          title: m.title,
-          radarrState: m.monitored ?
-            (m.hasFile ? RadarrDataState.AVAILABLE : RadarrDataState.MONITORED)
-            : RadarrDataState.UNMONITORED,
-        },
-      });
-      return;
-    }
+    const data: Partial<Movie> = {
+      radarrId: String(m.id),
+      tmdbId: (m.tmdbId && m.tmdbId !== 0) ? String(m.tmdbId) : null,
+      imdbId: (m.imdbId && m.imdbId !== '0') ? m.imdbId : null,
+      title: m.title,
+      radarrState: m.monitored ?
+        (m.hasFile ? RadarrDataState.AVAILABLE : RadarrDataState.MONITORED)
+        : RadarrDataState.UNMONITORED,
+    };
 
-    // TODO Update movie
+    if (movie) {
+      await this.client.movie.update({ data, where: { id: movie.id } });
+    } else {
+      await this.client.movie.create({ data });
+    }
+  }
+
+  private async findAndUpdateOldMovies(m: RadarrMovie[]) {
+    const { count } = await this.client.movie.updateMany({
+      data: {
+        radarrId: null,
+        radarrState: RadarrDataState.NONE,
+      },
+      where: {
+        OR: [
+          {
+            AND: [
+              { radarrId: { not: null } },
+              { radarrId: { notIn: m.map(m => String(m.id)) } },
+            ],
+          },
+          {
+            radarrState: { not: RadarrDataState.NONE },
+          },
+        ],
+      },
+    });
+
+    if (count > 0) {
+      RadarrHandler.logger.info(`Found and updated ${count} movies that are not in the Radarr database`);
+    }
   }
 }

@@ -1,6 +1,5 @@
 import { Logger, LogLevel } from './Logger';
 import { dump, DumpOptions } from 'js-yaml';
-import { log as bypassStdout } from 'console';
 
 const { log: defaultStdout } = console;
 
