@@ -1,9 +1,9 @@
-import { createLogger } from '../../../../utils/logger';
-import { RadarrMovie } from '../../../../types/radarr/api/RadarrMovie';
-import { Movie, PrismaClient, RadarrDataState } from '../../../../generated/prisma-client';
-import { CorePostOffice } from '../../postOffice';
-import { RadarrSyncMessage } from '../../../../messaging/messages/sync';
-import { Result } from '../../../../messaging/packet/types';
+import { createLogger } from '@/common/logger';
+import { RadarrMovie } from '@/types/radarr/api/RadarrMovie';
+import { Movie, PrismaClient, RadarrDataState } from '@/prisma-client';
+import { CorePostOffice } from '@/services/core/postOffice';
+import { RadarrSyncMessage } from '@/common/messaging/messages/sync';
+import { Result } from '@/common/messaging/packet/types';
 
 export class RadarrHandler {
   private static readonly logger = createLogger('RadarrHandler');

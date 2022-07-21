@@ -1,14 +1,14 @@
-import { Service, ServiceInit } from '../../utils/init/worker';
+import { Service, ServiceInit } from '@/common/init/worker';
 import { SonarrHandler } from './handler/connections/sonarr';
-import { createLogger } from '../../utils/logger';
-import { MessageTransport } from '../../messaging/transport';
+import { createLogger } from '@/common/logger';
+import { MessageTransport } from '@/common/messaging/transport';
 import { RadarrHandler } from './handler/connections/radarr';
 import { OmbiMovieHandler } from './handler/connections/ombiMovie';
 import { OmbiTvHandler } from './handler/connections/ombiTv';
 import { CorePostOffice } from './postOffice';
 import { UserHandler } from './handler/user';
 import { localGenerator } from 'nanoflakes';
-import { PrismaClient } from '../../generated/prisma-client';
+import { PrismaClient } from '@/prisma-client';
 import { CleanupHandler } from './handler/cleanup';
 
 export class FlixCore implements Service, ServiceInit {

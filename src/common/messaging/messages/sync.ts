@@ -1,9 +1,9 @@
 import { Message } from './index';
-import { SonarrSeries } from '../../types/sonarr/api/SonarrSeries';
-import { SonarrEpisode } from '../../types/sonarr/api/SonarrEpisode';
-import { RadarrMovie } from '../../types/radarr/api/RadarrMovie';
-import { MovieRequest } from '../../types/ombi/api/GetMovieRequests';
-import { TvRequest } from '../../types/ombi/api/GetTvRequests';
+import { SonarrSeries } from '@/types/sonarr/api/SonarrSeries';
+import { SonarrEpisode } from '@/types/sonarr/api/SonarrEpisode';
+import { RadarrMovie } from '@/types/radarr/api/RadarrMovie';
+import { MovieRequest } from '@/types/ombi/api/GetMovieRequests';
+import { TvRequest } from '@/types/ombi/api/GetTvRequests';
 
 export class SonarrSeriesSyncMessage extends Message {
   constructor(props?: Omit<SonarrSeriesSyncMessage, 'id'>) {

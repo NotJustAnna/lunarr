@@ -1,11 +1,11 @@
 import { Client, Intents } from 'discord.js';
 import * as process from 'process';
 import * as console from 'console';
-import { Service } from '../../utils/init/worker';
-import { createLogger } from '../../utils/logger';
-import { MessageTransport } from '../../messaging/transport';
-import { DiscordPostOffice } from './postOffice';
-import { ExitCode } from '../../utils/init/exitCode';
+import { Service } from '@/common/init/worker';
+import { createLogger } from '@/common/logger';
+import { MessageTransport } from '@/common/messaging/transport';
+import { DiscordPostOffice } from '@/services/discord/postOffice';
+import { ExitCode } from '@/common/utils/exitCode';
 
 export class FlixDiscord implements Service {
   private static readonly logger = createLogger('FlixDiscord');

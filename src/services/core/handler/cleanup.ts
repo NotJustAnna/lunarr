@@ -1,11 +1,11 @@
-import { createLogger } from '../../../utils/logger';
+import { createLogger } from '@/common/logger';
 import {
   JellyfinDataState,
   PrismaClient,
   RadarrDataState,
   SonarrDataState,
   SonarrEpisodeDataState,
-} from '../../../generated/prisma-client';
+} from '@/prisma-client';
 
 export class CleanupHandler {
   private static readonly logger = createLogger('CleanupHandler');

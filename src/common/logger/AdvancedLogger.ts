@@ -1,8 +1,8 @@
 import chalk, { Chalk } from 'chalk';
 import { dump } from 'js-yaml';
 import { highlight, Theme } from 'cli-highlight';
-import { SimpleLogger } from './SimpleLogger';
-import { LogLevel } from './Logger';
+import { SimpleLogger } from '@/common/logger/SimpleLogger';
+import { LogLevel } from '@/common/logger/Logger';
 
 export class AdvancedLogger extends SimpleLogger {
   protected messagePrefix(level: LogLevel, now: Date): string {

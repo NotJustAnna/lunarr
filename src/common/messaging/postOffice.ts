@@ -1,15 +1,15 @@
-import { MessageTransport } from './transport';
-import { ErrorMessage, Message, Reply } from './messages';
-import { PacketRouter } from './packet/router';
-import { ClassConstructor } from 'class-transformer';
-import { MessageReceiver, PacketReceiver, ReplyReceiver, Result } from './packet/types';
+import type { ClassConstructor } from 'class-transformer';
+import { MessageTransport } from '@/common/messaging/transport';
+import { ErrorMessage, Message, Reply } from '@/common/messaging/messages';
+import { PacketRouter } from '@/common/messaging/packet/router';
+import { MessageReceiver, PacketReceiver, ReplyReceiver, Result } from '@/common/messaging/packet/types';
 import {
   ServiceStartedMessage,
   ServiceStoppedMessage,
   StartServiceMessage,
   StopServiceMessage,
-} from './messages/services';
-import { ServiceStart } from '../utils/init/ServiceStart';
+} from '@/common/messaging/messages/services';
+import { ServiceStart } from '@/common/init/ServiceStart';
 
 export class PostOffice {
   private router = new PacketRouter();

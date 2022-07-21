@@ -1,7 +1,7 @@
-import { MessageTransport } from './transport';
-import { createLogger } from '../utils/logger';
-import { PacketConsumer } from './packet/types';
-import { Message } from './messages';
+import { MessageTransport } from '@/common/messaging/transport';
+import { createLogger } from '@/common/logger';
+import { PacketConsumer } from '@/common/messaging/packet/types';
+import { Message } from '@/common/messaging/messages';
 
 export class PostExchange {
   private static logger = createLogger('PostExchange');

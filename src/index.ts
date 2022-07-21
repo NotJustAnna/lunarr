@@ -1,5 +1,5 @@
 import 'source-map-support/register';
-import { startApp } from './utils/init/mainThread';
+import { startApp } from '@/common/init';
 
 // startApp('core');
 

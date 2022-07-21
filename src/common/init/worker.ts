@@ -1,10 +1,10 @@
-import { createLogger } from '../logger';
+import { createLogger } from '@/common/logger';
 import 'dotenv/config';
-import { ParentPortTransport } from '../../messaging/transport/parentPort';
-import { MessageTransport } from '../../messaging/transport';
-import { ErrorMessage } from '../../messaging/messages';
+import { ParentPortTransport } from '@/common/messaging/transport/parentPort';
+import { MessageTransport } from '@/common/messaging/transport';
+import { ErrorMessage } from '@/common/messaging/messages';
 import * as process from 'process';
-import { ExitCode } from './exitCode';
+import { ExitCode } from '@/common/utils/exitCode';
 
 export interface Service {
 }

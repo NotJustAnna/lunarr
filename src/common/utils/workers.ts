@@ -1,8 +1,8 @@
 import { MessagePort, parentPort as port } from 'worker_threads';
-import { Logger } from './logger/Logger';
-import { createLogger } from './logger';
+import { Logger } from '@/common/logger/Logger';
+import { createLogger } from '@/common/logger';
 import * as process from 'process';
-import { ExitCode } from './init/exitCode';
+import { ExitCode } from '@/common/utils/exitCode';
 
 export function parentPort(logger?: Logger): MessagePort {
   if (!port) {

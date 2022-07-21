@@ -1,6 +1,5 @@
-import { PostOffice } from '../../messaging/postOffice';
-import { MessageTransport } from '../../messaging/transport';
-import { InitFlatAssocMessage, InitFlatAssocReply } from '../../messaging/messages/flatAssoc';
+import { PostOffice } from '@/common/messaging/postOffice';
+import { MessageTransport } from '@/common/messaging/transport';
 
 export class CorePostOffice extends PostOffice {
   constructor(transport: MessageTransport) {

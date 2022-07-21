@@ -1,11 +1,11 @@
-import { createLogger } from '../../../utils/logger';
+import { createLogger } from '@/common/logger';
 import { NanoflakeLocalGenerator } from 'nanoflakes';
 import * as process from 'process';
-import { PrismaClient } from '../../../generated/prisma-client';
-import { CorePostOffice } from '../postOffice';
-import { InitFlatAssocMessage, InitFlatAssocReply } from '../../../messaging/messages/flatAssoc';
-import { ErrorReply } from '../../../messaging/messages';
-import { Result } from '../../../messaging/packet/types';
+import { PrismaClient } from '@/prisma-client';
+import { CorePostOffice } from '@/services/core/postOffice';
+import { InitFlatAssocMessage, InitFlatAssocReply } from '@/common/messaging/messages/flatAssoc';
+import { ErrorReply } from '@/common/messaging/messages';
+import { Result } from '@/common/messaging/packet/types';
 
 export class UserHandler {
   private static readonly logger = createLogger('UserHandler');
@@ -15,7 +15,7 @@ export class UserHandler {
   constructor(
     private readonly client: PrismaClient,
     private readonly postOffice: CorePostOffice,
-    private readonly nanoflakes: NanoflakeLocalGenerator
+    private readonly nanoflakes: NanoflakeLocalGenerator,
   ) {
     this.postOffice.ofType(InitFlatAssocMessage, (from, { id, discordUserId }) => {
       try {

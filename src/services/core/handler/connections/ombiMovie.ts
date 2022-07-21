@@ -1,9 +1,9 @@
-import { createLogger } from '../../../../utils/logger';
-import { MovieRequest } from '../../../../types/ombi/api/GetMovieRequests';
-import { Movie, OmbiRequestDataState, PrismaClient } from '../../../../generated/prisma-client';
-import { CorePostOffice } from '../../postOffice';
-import { OmbiMovieSyncMessage } from '../../../../messaging/messages/sync';
-import { Result } from '../../../../messaging/packet/types';
+import { createLogger } from '@/common/logger';
+import { MovieRequest } from '@/types/ombi/api/GetMovieRequests';
+import { Movie, OmbiRequestDataState, PrismaClient } from '@/prisma-client';
+import { CorePostOffice } from '@/services/core/postOffice';
+import { OmbiMovieSyncMessage } from '@/common/messaging/messages/sync';
+import { Result } from '@/common/messaging/packet/types';
 
 export class OmbiMovieHandler {
   private static readonly logger = createLogger('OmbiMovieHandler');

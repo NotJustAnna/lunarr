@@ -1,16 +1,10 @@
-import { SonarrEpisode } from '../../../../types/sonarr/api/SonarrEpisode';
-import { createLogger } from '../../../../utils/logger';
-import { SonarrSeries } from '../../../../types/sonarr/api/SonarrSeries';
-import {
-  PrismaClient,
-  Show,
-  ShowSeason,
-  SonarrDataState,
-  SonarrEpisodeDataState,
-} from '../../../../generated/prisma-client';
-import { CorePostOffice } from '../../postOffice';
-import { SonarrEpisodesSyncMessage, SonarrSeriesSyncMessage } from '../../../../messaging/messages/sync';
-import { Result } from '../../../../messaging/packet/types';
+import { SonarrEpisode } from '@/types/sonarr/api/SonarrEpisode';
+import { createLogger } from '@/common/logger';
+import { SonarrSeries } from '@/types/sonarr/api/SonarrSeries';
+import { PrismaClient, Show, ShowSeason, SonarrDataState, SonarrEpisodeDataState } from '@/prisma-client';
+import { CorePostOffice } from '@/services/core/postOffice';
+import { SonarrEpisodesSyncMessage, SonarrSeriesSyncMessage } from '@/common/messaging/messages/sync';
+import { Result } from '@/common/messaging/packet/types';
 import _ from 'lodash';
 
 export class SonarrHandler {
