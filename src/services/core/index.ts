@@ -1,14 +1,15 @@
 import { Service, ServiceInit } from '../../utils/init/worker';
-import { SonarrHandler } from './handler/sonarr';
+import { SonarrHandler } from './handler/connections/sonarr';
 import { createLogger } from '../../utils/logger';
 import { MessageTransport } from '../../messaging/transport';
-import { RadarrHandler } from './handler/radarr';
-import { OmbiMovieHandler } from './handler/ombiMovie';
-import { OmbiTvHandler } from './handler/ombiTv';
+import { RadarrHandler } from './handler/connections/radarr';
+import { OmbiMovieHandler } from './handler/connections/ombiMovie';
+import { OmbiTvHandler } from './handler/connections/ombiTv';
 import { CorePostOffice } from './postOffice';
 import { UserHandler } from './handler/user';
 import { localGenerator } from 'nanoflakes';
 import { PrismaClient } from '../../generated/prisma-client';
+import { CleanupHandler } from './handler/cleanup';
 
 export class FlixCore implements Service, ServiceInit {
   private static readonly logger = createLogger('FlixCore');
@@ -21,6 +22,7 @@ export class FlixCore implements Service, ServiceInit {
   private readonly ombiMovieHandler: OmbiMovieHandler;
   private readonly ombiTvHandler: OmbiTvHandler;
   private readonly userHandler: UserHandler;
+  private readonly cleanupHandler: CleanupHandler;
 
   private readonly nanoflakes = localGenerator(1653700000000, 0);
 
@@ -31,6 +33,7 @@ export class FlixCore implements Service, ServiceInit {
     this.ombiMovieHandler = new OmbiMovieHandler(this.client, this.postOffice);
     this.ombiTvHandler = new OmbiTvHandler(this.client, this.postOffice);
     this.userHandler = new UserHandler(this.client, this.postOffice, this.nanoflakes);
+    this.cleanupHandler = new CleanupHandler(this.client);
   }
 
   async init() {

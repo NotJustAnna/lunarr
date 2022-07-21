@@ -5,7 +5,7 @@ import { createLogger } from '../../../utils/logger';
 import axios from 'axios';
 import { PostOffice } from '../../../messaging/postOffice';
 import { ParentPortTransport } from '../../../messaging/transport/parentPort';
-import { SonarrSyncMessage } from '../../../messaging/messages/sync';
+import { SonarrEpisodesSyncMessage, SonarrSeriesSyncMessage } from '../../../messaging/messages/sync';
 import * as process from 'process';
 import { ExitCode } from '../../../utils/init/exitCode';
 import { attempt } from '../../../utils/attempt';
@@ -36,8 +36,8 @@ async function main() {
   });
 
   const allSeries = seriesResponse.data;
+  postOffice.send('core', new SonarrSeriesSyncMessage({ series: allSeries }));
   logger.info(`Found ${allSeries.length} series. Syncing episodes...`);
-
   let seriesDone = 0;
 
   const allEpisodesSynced = Promise.all(allSeries.map(async (series) => {
@@ -48,7 +48,7 @@ async function main() {
         },
       });
     });
-    postOffice.send('core', new SonarrSyncMessage({
+    postOffice.send('core', new SonarrEpisodesSyncMessage({
       series, episodes: episodesPromise.data,
     }));
     seriesDone++;
