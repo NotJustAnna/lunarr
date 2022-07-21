@@ -1,9 +1,9 @@
-import { createLogger } from '../../../utils/logger';
-import { TvRequest } from '../../../types/ombi/api/GetTvRequests';
-import { PrismaClient } from '../../../generated/prisma-client';
-import { CorePostOffice } from '../postOffice';
-import { OmbiTvSyncMessage } from '../../../messaging/messages/sync';
-import { Result } from '../../../messaging/packet/types';
+import { createLogger } from '../../../../utils/logger';
+import { TvRequest } from '../../../../types/ombi/api/GetTvRequests';
+import { PrismaClient } from '../../../../generated/prisma-client';
+import { CorePostOffice } from '../../postOffice';
+import { OmbiTvSyncMessage } from '../../../../messaging/messages/sync';
+import { Result } from '../../../../messaging/packet/types';
 
 export class OmbiTvHandler {
   private static readonly logger = createLogger('OmbiTvHandler');

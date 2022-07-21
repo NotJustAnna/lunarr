@@ -1,16 +1,16 @@
-import { SonarrEpisode } from '../../../types/sonarr/api/SonarrEpisode';
-import { createLogger } from '../../../utils/logger';
-import { SonarrSeries } from '../../../types/sonarr/api/SonarrSeries';
+import { SonarrEpisode } from '../../../../types/sonarr/api/SonarrEpisode';
+import { createLogger } from '../../../../utils/logger';
+import { SonarrSeries } from '../../../../types/sonarr/api/SonarrSeries';
 import {
   PrismaClient,
   Show,
   ShowSeason,
   SonarrDataState,
   SonarrEpisodeDataState,
-} from '../../../generated/prisma-client';
-import { CorePostOffice } from '../postOffice';
-import { SonarrSyncMessage } from '../../../messaging/messages/sync';
-import { Result } from '../../../messaging/packet/types';
+} from '../../../../generated/prisma-client';
+import { CorePostOffice } from '../../postOffice';
+import { SonarrEpisodesSyncMessage, SonarrSeriesSyncMessage } from '../../../../messaging/messages/sync';
+import { Result } from '../../../../messaging/packet/types';
 import _ from 'lodash';
 
 export class SonarrHandler {
@@ -20,15 +20,51 @@ export class SonarrHandler {
     private readonly client: PrismaClient,
     private readonly postOffice: CorePostOffice,
   ) {
-    this.postOffice.ofType(SonarrSyncMessage, (_, { episodes, series }) => {
-      this.sync(series, episodes).catch(error => {
+    this.postOffice.ofType(SonarrSeriesSyncMessage, (_, { series }) => {
+      this.syncSeries(series).catch(error =>
+        SonarrHandler.logger.error('Error while syncing Sonarr data', { error }),
+      );
+      return Result.Continue;
+    });
+    this.postOffice.ofType(SonarrEpisodesSyncMessage, (_, { episodes, series }) => {
+      this.syncEpisodes(series, episodes).catch(error => {
         SonarrHandler.logger.error('Error while syncing Sonarr data', { error });
       });
       return Result.Continue;
     });
   }
 
-  async sync(series: SonarrSeries, episodes: SonarrEpisode[]) {
+  async syncSeries(series: SonarrSeries[]) {
+    await Promise.all(series.map(s => this.createOrUpdateShow(s)));
+
+    // Find all shows that are not in the list and set them to the default state
+    const unknownShows = await this.client.show.findMany({
+      where: {
+        sonarrState: SonarrDataState.MONITORED,
+        sonarrId: { notIn: series.map(s => String(s.id)) },
+      },
+      select: { id: true },
+    }).then(shows => shows.map(s => s.id));
+
+    if (unknownShows.length > 0) {
+      await Promise.all([
+        this.client.show.updateMany({
+          data: { sonarrState: SonarrDataState.NONE },
+          where: { id: { in: unknownShows } },
+        }),
+        this.client.showSeason.updateMany({
+          data: { sonarrState: SonarrDataState.NONE },
+          where: { showId: { in: unknownShows } },
+        }),
+        this.client.showEpisode.updateMany({
+          data: { sonarrState: SonarrEpisodeDataState.NONE },
+          where: { season: { showId: { in: unknownShows } } },
+        }),
+      ]);
+    }
+  }
+
+  async syncEpisodes(series: SonarrSeries, episodes: SonarrEpisode[]) {
     const show = await this.createOrUpdateShow(series);
     await this.updateEpisodes(show.id, episodes);
   }
@@ -87,22 +123,21 @@ export class SonarrHandler {
         },
       });
 
-      if (!episode) {
-        await this.client.showEpisode.create({
-          data: {
-            seasonId: season.id,
-            number: sonarrEpisode.episodeNumber,
-            title: sonarrEpisode.title,
-            sonarrId: String(sonarrEpisode.id),
-            sonarrState: sonarrEpisode.monitored ?
-              (sonarrEpisode.hasFile ? SonarrEpisodeDataState.AVAILABLE : SonarrEpisodeDataState.MONITORED)
-              : SonarrEpisodeDataState.UNMONITORED,
-          },
-        });
-        continue;
-      }
+      const data = {
+        seasonId: season.id,
+        number: sonarrEpisode.episodeNumber,
+        title: sonarrEpisode.title,
+        sonarrId: String(sonarrEpisode.id),
+        sonarrState: sonarrEpisode.monitored ?
+          (sonarrEpisode.hasFile ? SonarrEpisodeDataState.AVAILABLE : SonarrEpisodeDataState.MONITORED)
+          : SonarrEpisodeDataState.UNMONITORED,
+      };
 
-      // TODO Update episode
+      if (episode) {
+        await this.client.showEpisode.update({ data, where: { id: episode.id } });
+      } else {
+        await this.client.showEpisode.create({ data });
+      }
     }
   }
 

@@ -5,8 +5,19 @@ import { RadarrMovie } from '../../types/radarr/api/RadarrMovie';
 import { MovieRequest } from '../../types/ombi/api/GetMovieRequests';
 import { TvRequest } from '../../types/ombi/api/GetTvRequests';
 
-export class SonarrSyncMessage extends Message {
-  constructor(props?: Omit<SonarrSyncMessage, 'id'>) {
+export class SonarrSeriesSyncMessage extends Message {
+  constructor(props?: Omit<SonarrSeriesSyncMessage, 'id'>) {
+    super();
+    if (props) {
+      Object.assign(this, props);
+    }
+  }
+
+  series!: SonarrSeries[];
+}
+
+export class SonarrEpisodesSyncMessage extends Message {
+  constructor(props?: Omit<SonarrEpisodesSyncMessage, 'id'>) {
     super();
     if (props) {
       Object.assign(this, props);

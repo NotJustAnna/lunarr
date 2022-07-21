@@ -41,7 +41,7 @@ model MovieAudioTrack {
   sampleRate  String    @map("moat_sample_rate")
 
   movieId     String    @db.Uuid @map("movi_id")
-  movie       Movie     @relation(fields: [movieId], references: [id])
+  movie       Movie     @relation(fields: [movieId], references: [id], onDelete: Cascade)
 }
 
 model MovieVideoTrack {
@@ -58,7 +58,7 @@ model MovieVideoTrack {
   range         String    @map("movt_range")
 
   movieId       String    @db.Uuid @map("movi_id")
-  movie         Movie     @relation(fields: [movieId], references: [id])
+  movie         Movie     @relation(fields: [movieId], references: [id], onDelete: Cascade)
 }
 
 model MovieSubtitleTrack {
@@ -72,7 +72,7 @@ model MovieSubtitleTrack {
   forced      Boolean   @map("most_forced")
 
   movieId     String    @db.Uuid @map("movi_id")
-  movie       Movie     @relation(fields: [movieId], references: [id])
+  movie       Movie     @relation(fields: [movieId], references: [id], onDelete: Cascade)
 }
 
 model Show {
@@ -105,7 +105,7 @@ model ShowSeason {
   sonarrState     SonarrDataState   @default(NONE) @map("shse_sonarr_state")
 
   showId          String            @db.Uuid @map("show_id")
-  show            Show              @relation(fields: [showId], references: [id])
+  show            Show              @relation(fields: [showId], references: [id], onDelete: Cascade)
   episodes        ShowEpisode[]
 
   @@unique([showId, number])
@@ -126,7 +126,7 @@ model ShowEpisode {
   ombiRequestState      OmbiRequestDataState    @default(NONE) @map("shep_ombi_request_state")
 
   seasonId              String                  @db.Uuid @map("shse_id")
-  season                ShowSeason              @relation(fields: [seasonId], references: [id])
+  season                ShowSeason              @relation(fields: [seasonId], references: [id], onDelete: Cascade)
   episodeAudioTrack     EpisodeAudioTrack[]
   episodeSubtitleTrack  EpisodeSubtitleTrack[]
   episodeVideoTrack     EpisodeVideoTrack[]
@@ -146,7 +146,7 @@ model EpisodeAudioTrack {
   sampleRate  String    @map("epat_sample_rate")
 
   episodeId   String    @db.Uuid @map("shep_id")
-  episode     ShowEpisode   @relation(fields: [episodeId], references: [id])
+  episode     ShowEpisode   @relation(fields: [episodeId], references: [id], onDelete: Cascade)
 }
 
 model EpisodeVideoTrack {
@@ -163,7 +163,7 @@ model EpisodeVideoTrack {
   range       String      @map("epvt_range")
 
   episodeId   String      @db.Uuid @map("shep_id")
-  episode     ShowEpisode @relation(fields: [episodeId], references: [id])
+  episode     ShowEpisode @relation(fields: [episodeId], references: [id], onDelete: Cascade)
 }
 
 model EpisodeSubtitleTrack {
@@ -177,7 +177,7 @@ model EpisodeSubtitleTrack {
   forced      Boolean     @map("epst_forced")
 
   episodeId   String      @db.Uuid @map("shep_id")
-  episode     ShowEpisode @relation(fields: [episodeId], references: [id])
+  episode     ShowEpisode @relation(fields: [episodeId], references: [id], onDelete: Cascade)
 }
 
 enum JellyfinDataState {
