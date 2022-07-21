@@ -1,5 +1,5 @@
 import { Message, Reply } from './index';
-import { ServiceStart } from '../../utils/init/ServiceStart';
+import { ServiceStart } from '../../init/ServiceStart';
 
 export class StartServiceMessage extends Message {
   services!: ServiceStart[];

@@ -1,9 +1,9 @@
 import 'source-map-support/register';
-import { createLogger } from '../../../utils/logger';
-import { PostOffice } from '../../../messaging/postOffice';
-import { ParentPortTransport } from '../../../messaging/transport/parentPort';
+import { createLogger } from '@/common/logger';
+import { PostOffice } from '@/common/messaging/postOffice';
+import { ParentPortTransport } from '@/common/messaging/transport/parentPort';
 import process from 'process';
-import { ExitCode } from '../../../utils/init/exitCode';
+import { ExitCode } from '@/common/utils/exitCode';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import { SlashCommandBuilder } from '@discordjs/builders';

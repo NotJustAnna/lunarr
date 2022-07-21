@@ -1,5 +1,5 @@
 import { MessageTransport } from './index';
-import { createLogger } from '../../utils/logger';
+import { createLogger } from '../../logger';
 import { Worker } from 'worker_threads';
 import { MessagePacket } from '../packet';
 import { instanceToPlain, plainToInstance } from 'class-transformer';

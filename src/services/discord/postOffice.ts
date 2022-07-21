@@ -1,6 +1,6 @@
-import { PostOffice } from '../../messaging/postOffice';
-import { MessageTransport } from '../../messaging/transport';
-import { InitFlatAssocMessage, InitFlatAssocReply } from '../../messaging/messages/flatAssoc';
+import { PostOffice } from '@/common/messaging/postOffice';
+import { MessageTransport } from '@/common/messaging/transport';
+import { InitFlatAssocMessage, InitFlatAssocReply } from '@/common/messaging/messages/flatAssoc';
 
 export class DiscordPostOffice extends PostOffice {
   constructor(transport: MessageTransport) {

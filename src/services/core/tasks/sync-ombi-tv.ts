@@ -1,13 +1,13 @@
 import 'source-map-support/register';
 import process from 'process';
-import { createLogger } from '../../../utils/logger';
-import { PostOffice } from '../../../messaging/postOffice';
-import { ParentPortTransport } from '../../../messaging/transport/parentPort';
-import { attempt } from '../../../utils/attempt';
-import { ExitCode } from '../../../utils/init/exitCode';
+import { createLogger } from '@/common/logger';
+import { PostOffice } from '@/common/messaging/postOffice';
+import { ParentPortTransport } from '@/common/messaging/transport/parentPort';
+import { attempt } from '@/common/utils/attempt';
+import { ExitCode } from '@/common/utils/exitCode';
 import axios from 'axios';
-import { OmbiTvSyncMessage } from '../../../messaging/messages/sync';
-import { TvRequest } from '../../../types/ombi/api/GetTvRequests';
+import { OmbiTvSyncMessage } from '@/common/messaging/messages/sync';
+import { TvRequest } from '@/types/ombi/api/GetTvRequests';
 
 const logger = createLogger('Task "Sync Ombi TV"');
 const postOffice = new PostOffice(new ParentPortTransport(true));

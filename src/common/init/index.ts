@@ -1,10 +1,10 @@
 import { Worker } from 'worker_threads';
-import { createLogger } from '../logger';
+import { createLogger } from '@/common/logger';
 import 'dotenv/config';
 import { resolve } from 'path';
-import { ServiceConfig, ServiceStart } from './ServiceStart';
-import { PostExchange } from '../../messaging/postExchange';
-import { WorkerTransport } from '../../messaging/transport/worker';
+import { ServiceConfig, ServiceStart } from '@/common/init/ServiceStart';
+import { PostExchange } from '@/common/messaging/postExchange';
+import { WorkerTransport } from '@/common/messaging/transport/worker';
 import {
   ListServicesReply,
   ServiceStartedMessage,
@@ -12,9 +12,9 @@ import {
   StartServiceMessage,
   StopServiceMessage,
   WhoAmIReply,
-} from '../../messaging/messages/services';
-import { ErrorMessage, LogMessage } from '../../messaging/messages';
-import { ExitCode, exitCodeMeanings } from './exitCode';
+} from '@/common/messaging/messages/services';
+import { ErrorMessage, LogMessage } from '@/common/messaging/messages';
+import { ExitCode, exitCodeMeanings } from '@/common/utils/exitCode';
 
 export function startApp(...services: ServiceStart[]) {
   createLogger('main').info('Starting application...');

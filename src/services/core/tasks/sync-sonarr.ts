@@ -1,14 +1,14 @@
 import 'source-map-support/register';
-import { SonarrSeries } from '../../../types/sonarr/api/SonarrSeries';
-import { SonarrEpisode } from '../../../types/sonarr/api/SonarrEpisode';
-import { createLogger } from '../../../utils/logger';
+import { SonarrSeries } from '@/types/sonarr/api/SonarrSeries';
+import { SonarrEpisode } from '@/types/sonarr/api/SonarrEpisode';
+import { createLogger } from '@/common/logger';
 import axios from 'axios';
-import { PostOffice } from '../../../messaging/postOffice';
-import { ParentPortTransport } from '../../../messaging/transport/parentPort';
-import { SonarrEpisodesSyncMessage, SonarrSeriesSyncMessage } from '../../../messaging/messages/sync';
+import { PostOffice } from '@/common/messaging/postOffice';
+import { ParentPortTransport } from '@/common/messaging/transport/parentPort';
+import { SonarrEpisodesSyncMessage, SonarrSeriesSyncMessage } from '@/common/messaging/messages/sync';
 import * as process from 'process';
-import { ExitCode } from '../../../utils/init/exitCode';
-import { attempt } from '../../../utils/attempt';
+import { ExitCode } from '@/common/utils/exitCode';
+import { attempt } from '@/common/utils/attempt';
 
 const logger = createLogger('Task "Sync Sonarr"');
 const postOffice = new PostOffice(new ParentPortTransport(true));
