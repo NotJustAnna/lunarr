@@ -11,6 +11,7 @@ export { HttpController } from './http';
 export { BazarrIntegration } from './integrations/bazarr';
 export { DiscordIntegration } from './integrations/discord';
 export { JellyfinIntegration } from './integrations/jellyfin';
+export { LidarrIntegration } from './integrations/lidarr';
 export { OmbiIntegration } from './integrations/ombi';
 export { OverseerrIntegration } from './integrations/overseerr';
 export { PlexIntegration } from './integrations/plex';
