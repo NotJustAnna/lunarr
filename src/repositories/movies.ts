@@ -1,114 +1,50 @@
 import { Service } from 'typedi';
 import { createLogger } from '@/common/logger';
-import { Movie, OmbiRequestDataState, Prisma, PrismaClient, RadarrDataState } from '@/prisma-client';
-import { RadarrMovie } from '@/types/radarr/api/RadarrMovie';
-import { MovieRequest } from '@/types/ombi/api/GetMovieRequests';
+import { Movie, Prisma, PrismaClient } from '@/prisma-client';
+import { EventEmitterService } from '@/services/eventEmitter';
 import MovieWhereInput = Prisma.MovieWhereInput;
 
 @Service()
 export class MoviesRepository {
   private static readonly logger = createLogger('MoviesRepository');
 
-  constructor(private readonly client: PrismaClient) {
+  constructor(
+    private readonly client: PrismaClient,
+    private readonly events: EventEmitterService,
+  ) {
   }
 
-  async upsertFromRadarr(externalMovie: RadarrMovie) {
-    const radarrId = String(externalMovie.id);
-    const tmdbId = String(externalMovie.tmdbId);
-
-    const movie = await this.findUniqueOrMerge({
-      OR: [
-        { radarrId },
-        ...((externalMovie.tmdbId && externalMovie.tmdbId !== 0) ? [{ tmdbId }] : []),
-        ...((externalMovie.imdbId && externalMovie.imdbId !== '0') ? [{ imdbId: externalMovie.imdbId }] : []),
-      ],
-    });
-
-    const data: Partial<Movie> = {
-      radarrId,
-      tmdbId: (externalMovie.tmdbId && externalMovie.tmdbId !== 0) ? tmdbId : undefined,
-      imdbId: (externalMovie.imdbId && externalMovie.imdbId !== '0') ? externalMovie.imdbId : undefined,
-      title: externalMovie.title,
-      radarrState: externalMovie.monitored ?
-        (externalMovie.hasFile ? RadarrDataState.AVAILABLE : RadarrDataState.MONITORED)
-        : RadarrDataState.UNMONITORED,
-    };
-
-    if (movie) {
-      return this.client.movie.update({ data, where: { id: movie.id } });
-    } else {
-      return this.client.movie.create({ data });
+  private static fromChanges(changes: Partial<Movie>): MovieWhereInput {
+    const finders: MovieWhereInput[] = [];
+    if (changes.jellyfinId) {
+      finders.push({ jellyfinId: changes.jellyfinId });
     }
-  }
-
-  async upsertFromOmbi(externalMovie: MovieRequest) {
-    const ombiRequestId = String(externalMovie.id);
-    const tmdbId = String(externalMovie.theMovieDbId);
-
-    const movie = await this.findUniqueOrMerge({
-      OR: [
-        { ombiRequestId },
-        ...((externalMovie.theMovieDbId && externalMovie.theMovieDbId !== 0) ? [{ tmdbId }] : []),
-        ...((externalMovie.imdbId && externalMovie.imdbId !== '0') ? [{ imdbId: externalMovie.imdbId }] : []),
-      ],
-    });
-
-    const data: Partial<Movie> = {
-      ombiRequestId,
-      tmdbId: (externalMovie.theMovieDbId && externalMovie.theMovieDbId !== 0) ? tmdbId : null,
-      imdbId: (externalMovie.imdbId && externalMovie.imdbId !== '0') ? externalMovie.imdbId : null,
-      title: externalMovie.title,
-      ombiRequestState: externalMovie.available ? OmbiRequestDataState.AVAILABLE :
-        externalMovie.denied ? OmbiRequestDataState.REQUEST_DENIED :
-          externalMovie.approved ? OmbiRequestDataState.PROCESSING_REQUEST :
-            OmbiRequestDataState.PENDING_APPROVAL,
-    };
-
-    if (movie) {
-      return this.client.movie.update({ data, where: { id: movie.id } });
-    } else {
-      return this.client.movie.create({ data });
+    if (changes.radarrId) {
+      finders.push({ radarrId: changes.radarrId });
     }
+    if (changes.ombiRequestId) {
+      finders.push({ ombiRequestId: changes.ombiRequestId });
+    }
+    if (changes.tmdbId) {
+      finders.push({ tmdbId: changes.tmdbId });
+    }
+    if (changes.imdbId) {
+      finders.push({ imdbId: changes.imdbId });
+    }
+    return { OR: finders };
   }
 
-  async ensureOnlyRadarrMovies(externalMovies: RadarrMovie[]) {
-    const { count } = await this.client.movie.updateMany({
-      data: {
-        radarrId: null,
-        radarrState: RadarrDataState.NONE,
-      },
-      where: {
-        radarrId: {
-          not: null,
-          notIn: externalMovies.map(m => String(m.id)),
-        },
-        radarrState: {
-          not: RadarrDataState.NONE,
-        },
-      },
-    });
-
-    return count;
-  }
-
-  async ensureOnlyOmbiMovies(externalMovies: MovieRequest[]) {
-    const { count } = await this.client.movie.updateMany({
-      data: {
-        ombiRequestId: null,
-        ombiRequestState: OmbiRequestDataState.NONE,
-      },
-      where: {
-        ombiRequestId: {
-          not: null,
-          notIn: externalMovies.map(m => String(m.id)),
-        },
-        radarrState: {
-          not: OmbiRequestDataState.NONE,
-        },
-      },
-    });
-
-    return count;
+  async sync(changes: Partial<Movie>) {
+    const movie = await this.findUniqueOrMerge(MoviesRepository.fromChanges(changes));
+    if (movie) {
+      const updatedMovie = await this.client.movie.update({ data: changes, where: { id: movie.id } });
+      await this.events.fromMovieChanges(movie, changes);
+      return updatedMovie;
+    } else {
+      const newMovie = await this.client.movie.create({ data: changes });
+      await this.events.fromNewMovie(newMovie);
+      return newMovie;
+    }
   }
 
   private async findUniqueOrMerge(where: MovieWhereInput) {
@@ -137,5 +73,29 @@ export class MoviesRepository {
       this.client.movie.deleteMany({ where: { id: { not: movies[0].id, in: movies.map(m => m.id) } } }),
     ]);
     return data;
+  }
+
+  async untrack<Key extends keyof Movie, State extends keyof Movie>(
+    foreignKey: Key, allowedKeys: MovieWhereInput[Key][],
+    stateKey: State, allowedState: MovieWhereInput[State],
+  ) {
+    const movies = await this.client.movie.findMany({
+      where: {
+        [foreignKey]: { not: null, notIn: allowedKeys },
+        [stateKey]: { not: allowedState },
+      },
+    });
+
+    if (movies.length > 0) {
+      await this.client.movie.updateMany({
+        data: { [foreignKey]: null, [stateKey]: allowedState },
+        where: { id: { in: movies.map(m => m.id) } },
+      });
+      await Promise.all(
+        movies.map(
+          m => this.events.fromMovieChanges(m, { [foreignKey]: null, [stateKey]: allowedState }),
+        ),
+      );
+    }
   }
 }
