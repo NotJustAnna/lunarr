@@ -3,14 +3,14 @@ import { RadarrMovie } from '@/types/radarr/api/RadarrMovie';
 import { createLogger } from '@/common/logger';
 import { attempt } from '@/common/utils/attempt';
 import axios, { AxiosInstance } from 'axios';
-import { MoviesRepository } from '@/repositories/movies';
+import { RadarrIntegrationService } from '@/services/integrations/radarr';
 
 export class SyncRadarrJob implements Job {
   private static readonly logger = createLogger('Job "Sync Radarr"');
   private api: AxiosInstance;
 
   constructor(
-    private readonly movies: MoviesRepository,
+    private readonly radarr: RadarrIntegrationService,
     radarrUrl: string,
     radarrApiKey: string,
   ) {
@@ -28,10 +28,7 @@ export class SyncRadarrJob implements Job {
     const movies = response.data;
     SyncRadarrJob.logger.info(`Radarr sync complete! Found ${movies.length} movies.`);
 
-    await Promise.all(movies.map(movie => this.movies.upsertFromRadarr(movie)));
-    const count = await this.movies.ensureOnlyRadarrMovies(movies);
-    if (count > 0) {
-      SyncRadarrJob.logger.info(`Untracked ${count} movies that aren't known by Radarr anymore.`);
-    }
+    await Promise.all(movies.map(movie => this.radarr.sync(movie)));
+    await this.radarr.untrack(movies);
   }
 }
