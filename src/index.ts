@@ -1,6 +1,8 @@
 import 'source-map-support/register';
-import { startApp } from '@/common/init';
+import 'reflect-metadata';
+import { initApp } from '@/common/init';
+import { createLogger } from '@/common/logger';
 
-// startApp('core');
-
-startApp('discord', 'http', 'core');
+initApp().catch((error) => {
+  createLogger('Application').error('Error during application start-up', { error });
+});
