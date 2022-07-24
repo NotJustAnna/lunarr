@@ -53,6 +53,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["bufferutil", "npm:4.0.6"],\
             ["chalk", "npm:4.1.2"],\
             ["class-transformer", "npm:0.5.1"],\
+            ["class-validator", "npm:0.13.2"],\
             ["cli-highlight", "npm:2.1.11"],\
             ["deep-equal", "npm:2.0.5"],\
             ["discord-api-types", "npm:0.31.2"],\
@@ -72,6 +73,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["ts-node", "virtual:634b264c0e2c749f3b69945a68b21231c13531f2742206bf9364f4f8f4a28122d0183ed5ab181a5eba43cbd869781097337fed2b38bc9863d5969b0fcee765dc#npm:10.8.0"],\
             ["tsconfig-paths", "npm:4.0.0"],\
             ["tsconfig-replace-paths", "npm:0.0.11"],\
+            ["typedi", "npm:0.10.0"],\
             ["typescript", "patch:typescript@npm%3A4.6.3#~builtin<compat/typescript>::version=4.6.3&hash=bda367"],\
             ["utf-8-validate", "npm:5.0.9"],\
             ["uuid", "npm:8.3.2"],\
@@ -1175,6 +1177,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["class-validator", [\
+        ["npm:0.13.2", {\
+          "packageLocation": "./.yarn/cache/class-validator-npm-0.13.2-915206252c-0deb4c29fa.zip/node_modules/class-validator/",\
+          "packageDependencies": [\
+            ["class-validator", "npm:0.13.2"],\
+            ["libphonenumber-js", "npm:1.10.9"],\
+            ["validator", "npm:13.7.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["clean-stack", [\
         ["npm:2.2.0", {\
           "packageLocation": "./.yarn/cache/clean-stack-npm-2.2.0-a8ce435a5c-2ac8cd2b2f.zip/node_modules/clean-stack/",\
@@ -1889,6 +1902,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["bufferutil", "npm:4.0.6"],\
             ["chalk", "npm:4.1.2"],\
             ["class-transformer", "npm:0.5.1"],\
+            ["class-validator", "npm:0.13.2"],\
             ["cli-highlight", "npm:2.1.11"],\
             ["deep-equal", "npm:2.0.5"],\
             ["discord-api-types", "npm:0.31.2"],\
@@ -1908,6 +1922,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["ts-node", "virtual:634b264c0e2c749f3b69945a68b21231c13531f2742206bf9364f4f8f4a28122d0183ed5ab181a5eba43cbd869781097337fed2b38bc9863d5969b0fcee765dc#npm:10.8.0"],\
             ["tsconfig-paths", "npm:4.0.0"],\
             ["tsconfig-replace-paths", "npm:0.0.11"],\
+            ["typedi", "npm:0.10.0"],\
             ["typescript", "patch:typescript@npm%3A4.6.3#~builtin<compat/typescript>::version=4.6.3&hash=bda367"],\
             ["utf-8-validate", "npm:5.0.9"],\
             ["uuid", "npm:8.3.2"],\
@@ -2726,6 +2741,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["keyv", "npm:4.3.2"],\
             ["compress-brotli", "npm:1.3.8"],\
             ["json-buffer", "npm:3.0.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["libphonenumber-js", [\
+        ["npm:1.10.9", {\
+          "packageLocation": "./.yarn/cache/libphonenumber-js-npm-1.10.9-4c52a5ca1a-4c2940149d.zip/node_modules/libphonenumber-js/",\
+          "packageDependencies": [\
+            ["libphonenumber-js", "npm:1.10.9"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -4184,6 +4208,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["typedi", [\
+        ["npm:0.10.0", {\
+          "packageLocation": "./.yarn/cache/typedi-npm-0.10.0-d5771a2dc0-d26491e368.zip/node_modules/typedi/",\
+          "packageDependencies": [\
+            ["typedi", "npm:0.10.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["typescript", [\
         ["patch:typescript@npm%3A4.6.3#~builtin<compat/typescript>::version=4.6.3&hash=bda367", {\
           "packageLocation": "./.yarn/cache/typescript-patch-30b732d1e2-6bf45caf84.zip/node_modules/typescript/",\
@@ -4287,6 +4320,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/v8-compile-cache-lib-npm-3.0.1-4886071ece-78089ad549.zip/node_modules/v8-compile-cache-lib/",\
           "packageDependencies": [\
             ["v8-compile-cache-lib", "npm:3.0.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["validator", [\
+        ["npm:13.7.0", {\
+          "packageLocation": "./.yarn/cache/validator-npm-13.7.0-624277e841-2b83283de1.zip/node_modules/validator/",\
+          "packageDependencies": [\
+            ["validator", "npm:13.7.0"]\
           ],\
           "linkType": "HARD"\
         }]\
