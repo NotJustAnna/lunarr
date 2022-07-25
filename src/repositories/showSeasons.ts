@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import { Prisma, PrismaClient, Show, ShowSeason } from '@/prisma-client';
+import { Prisma, PrismaClient, Show, ShowSeason } from '@prisma/client';
 import { EventEmitterService } from '@/services/eventEmitter';
 import ShowSeasonWhereInput = Prisma.ShowSeasonWhereInput;
 

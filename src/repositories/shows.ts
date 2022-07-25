@@ -1,5 +1,5 @@
 import { createLogger } from '@/common/logger';
-import { Prisma, PrismaClient, Show } from '@/prisma-client';
+import { Prisma, PrismaClient, Show } from '@prisma/client';
 import { Service } from 'typedi';
 import { EventEmitterService } from '@/services/eventEmitter';
 import ShowWhereInput = Prisma.ShowWhereInput;

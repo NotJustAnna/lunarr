@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import { Movie, Show, ShowEpisode, ShowSeason } from '@/prisma-client';
+import { Movie, Show, ShowEpisode, ShowSeason } from '@prisma/client';
 
 @Service()
 export class EventEmitterService {
