@@ -17,3 +17,4 @@ export { OverseerrIntegration } from './integrations/overseerr';
 export { PlexIntegration } from './integrations/plex';
 export { RadarrIntegration } from './integrations/radarr';
 export { SonarrIntegration } from './integrations/sonarr';
+export { WebhooksIntegration } from './integrations/webhooks';
