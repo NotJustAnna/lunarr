@@ -48,7 +48,7 @@ export class MoviesRepository {
   }
 
   private async findUniqueOrMerge(where: MovieWhereInput) {
-    const movies = await this.client.movie.findMany({ where, orderBy: { createdAt: 'asc' } });
+    const movies: Movie[] = await this.client.movie.findMany({ where, orderBy: { createdAt: 'asc' } });
     if (movies.length === 0) {
       return null;
     }
@@ -68,9 +68,10 @@ export class MoviesRepository {
       movie.ombiRequestState = duplicate.ombiRequestState || movie.ombiRequestState;
       return movie;
     });
+
     await this.client.$transaction([
-      this.client.movie.update({ data, where: { id: movies[0].id } }),
-      this.client.movie.deleteMany({ where: { id: { not: movies[0].id, in: movies.map(m => m.id) } } }),
+      this.client.movie.update({ data, where: { id: data.id } }),
+      this.client.movie.deleteMany({ where: { id: { not: data.id, in: movies.slice(1).map(m => m.id) } } }),
     ]);
     return data;
   }
