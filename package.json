@@ -25,7 +25,6 @@
     "reflect-metadata": "^0.1.13",
     "source-map-support": "^0.5.21",
     "typedi": "^0.10.0",
-    "typescript": "^4.6.3",
     "utf-8-validate": "^5.0.9",
     "uuid": "^8.3.2",
     "zlib-sync": "^0.1.7"
@@ -43,12 +42,14 @@
     "@types/qs": "^6.9.7",
     "@types/serve-static": "^1.13.10",
     "@types/uuid": "^8.3.4",
+    "@yarnpkg/plugin-compat": "^4.0.0-rc.14",
     "@yarnpkg/pnpify": "^4.0.0-rc.11",
     "prisma": "4.0.0",
     "rimraf": "^3.0.2",
     "ts-node": "^10.8.0",
     "tsconfig-paths": "^4.0.0",
-    "tsconfig-replace-paths": "^0.0.11"
+    "tsconfig-replace-paths": "^0.0.11",
+    "typescript": "^4.7.4"
   },
   "scripts": {
     "build": "rimraf ./dist && tsc && tsconfig-replace-paths && ./scripts/copy-assets-from-src.sh",
