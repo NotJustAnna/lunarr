@@ -2,6 +2,7 @@ import { Service } from 'typedi';
 import { Movie, OmbiRequestDataState } from '@/prisma-client';
 import { MovieRequest } from '@/types/ombi/api/GetMovieRequests';
 import { MoviesRepository } from '@/repositories/movies';
+import { TvRequest } from '@/types/ombi/api/GetTvRequests';
 
 @Service()
 export class OmbiIntegrationService {
@@ -22,12 +23,20 @@ export class OmbiIntegrationService {
     return this.movies.sync(changes);
   }
 
+  async syncShow(external: TvRequest) {
+
+  }
+
   async untrackMovies(allowedExternal: MovieRequest[]) {
-    return this.movies.untrack(
+    return this.movies.foreignUntrack(
       'ombiRequestId',
       allowedExternal.map(m => String(m.id)),
       'ombiRequestState',
       OmbiRequestDataState.NONE,
     );
+  }
+
+  async untrackShows(allowedExternal: TvRequest[]) {
+
   }
 }

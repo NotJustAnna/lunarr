@@ -1,16 +1,7 @@
 import { createLogger } from '@/common/logger';
-import {
-  OmbiRequestDataState,
-  Prisma,
-  PrismaClient,
-  Show,
-  SonarrDataState,
-  SonarrEpisodeDataState,
-} from '@/prisma-client';
+import { Prisma, PrismaClient, Show } from '@/prisma-client';
 import { Service } from 'typedi';
-import { SonarrSeries } from '@/types/sonarr/api/SonarrSeries';
-import { ShowSeasonsRepository } from './showSeasons';
-import { TvRequest } from '@/types/ombi/api/GetTvRequests';
+import { EventEmitterService } from '@/services/eventEmitter';
 import ShowWhereInput = Prisma.ShowWhereInput;
 
 @Service()
@@ -19,112 +10,44 @@ export class ShowsRepository {
 
   constructor(
     private readonly client: PrismaClient,
-    private readonly showSeasons: ShowSeasonsRepository,
+    private readonly events: EventEmitterService,
   ) {
   }
 
-  async upsertFromSonarr(externalSeries: SonarrSeries) {
-    const sonarrId = String(externalSeries.id);
-    const tvdbId = String(externalSeries.tvdbId);
-    const tvMazeId = String(externalSeries.tvMazeId);
-    const tvRageId = String(externalSeries.tvRageId);
-
-    const show = await this.findUniqueOrMerge({
-      OR: [
-        { sonarrId },
-        ...((externalSeries.tvdbId && externalSeries.tvdbId !== 0) ? [{ tvdbId }] : []),
-        ...((externalSeries.tvMazeId && externalSeries.tvMazeId !== 0) ? [{ tvMazeId }] : []),
-        ...((externalSeries.tvRageId && externalSeries.tvRageId !== 0) ? [{ tvRageId }] : []),
-      ],
-    });
-
-    const data: Partial<Show> = {
-      sonarrId: sonarrId,
-      tvdbId: (externalSeries.tvdbId && externalSeries.tvdbId !== 0) ? tvdbId : null,
-      tvMazeId: (externalSeries.tvMazeId && externalSeries.tvMazeId !== 0) ? String(externalSeries.tvMazeId) : null,
-      tvRageId: (externalSeries.tvRageId && externalSeries.tvRageId !== 0) ? String(externalSeries.tvRageId) : null,
-      title: externalSeries.title,
-      sonarrState: externalSeries.monitored ? SonarrDataState.MONITORED : SonarrDataState.UNMONITORED,
-    };
-
-    if (!show) {
-      return this.client.show.create({
-        data: {
-          ...data,
-          seasons: {
-            createMany: {
-              data: externalSeries.seasons.map(season => ({
-                number: season.seasonNumber,
-                sonarrState: season.monitored ? SonarrDataState.MONITORED : SonarrDataState.UNMONITORED,
-              })),
-            },
-          },
-        },
-      });
-    } else {
-      await this.client.show.update({ data, where: { id: show.id } });
-      await this.showSeasons.batchUpsertFromSonarr(show.id, externalSeries.seasons);
+  private static fromChanges(changes: Partial<Show>): ShowWhereInput {
+    const finders: ShowWhereInput[] = [];
+    if (changes.jellyfinId) {
+      finders.push({ jellyfinId: changes.jellyfinId });
     }
-
-    return show;
+    if (changes.sonarrId) {
+      finders.push({ sonarrId: changes.sonarrId });
+    }
+    if (changes.ombiRequestId) {
+      finders.push({ ombiRequestId: changes.ombiRequestId });
+    }
+    if (changes.tvdbId) {
+      finders.push({ tvdbId: changes.tvdbId });
+    }
+    if (changes.tvRageId) {
+      finders.push({ tvRageId: changes.tvRageId });
+    }
+    if (changes.tvMazeId) {
+      finders.push({ tvMazeId: changes.tvMazeId });
+    }
+    return { OR: finders };
   }
 
-  async upsertFromOmbi(externalShow: TvRequest) {
-    // TODO
-  }
-
-  async ensureOnlySonarrShows(externalSeries: SonarrSeries[]) {
-    await this.client.show.updateMany({
-      data: {
-        sonarrId: null,
-        sonarrState: SonarrDataState.NONE,
-      },
-      where: {
-        sonarrId: {
-          not: null,
-          notIn: externalSeries.map(s => String(s.id)),
-        },
-        sonarrState: {
-          not: SonarrDataState.NONE,
-        },
-      },
-    });
-
-    await this.client.showSeason.updateMany({
-      data: { sonarrState: SonarrDataState.NONE },
-      where: { show: { sonarrState: SonarrDataState.NONE } },
-    });
-
-    await this.client.showEpisode.updateMany({
-      data: { sonarrState: SonarrEpisodeDataState.NONE },
-      where: { season: { sonarrState: SonarrDataState.NONE } },
-    });
-  }
-
-  async ensureOnlyOmbiShows(externalShows: TvRequest[]) {
-    await this.client.show.updateMany({
-      data: {
-        ombiRequestId: null,
-      },
-      where: {
-        ombiRequestId: {
-          not: null,
-          notIn: externalShows.map(s => String(s.id)),
-        },
-      },
-    });
-
-    await this.client.showEpisode.updateMany({
-      data: {
-        ombiRequestState: OmbiRequestDataState.NONE,
-      },
-      where: {
-        ombiRequestState: {
-          not: OmbiRequestDataState.NONE,
-        },
-        season: { show: { ombiRequestId: null } },
-      },
-    });
+  async sync(changes: Partial<Show>) {
+    const show = await this.findUniqueOrMerge(ShowsRepository.fromChanges(changes));
+    if (show) {
+      const updatedShow = await this.client.show.update({ data: changes, where: { id: show.id } });
+      await this.events.fromShowChanges(show, changes);
+      return updatedShow;
+    } else {
+      const newShow = await this.client.show.create({ data: changes });
+      await this.events.fromNewShow(newShow);
+      return newShow;
+    }
   }
 
   private async findUniqueOrMerge(where: ShowWhereInput) {
@@ -153,5 +76,29 @@ export class ShowsRepository {
       this.client.show.deleteMany({ where: { id: { not: shows[0].id, in: shows.map(m => m.id) } } }),
     ]);
     return data;
+  }
+
+  async foreignUntrack<Key extends keyof Show, State extends keyof Show>(
+    foreignKey: Key, allowedKeys: ShowWhereInput[Key][],
+    stateKey: State, allowedState: ShowWhereInput[State],
+  ) {
+    const shows = await this.client.show.findMany({
+      where: {
+        [foreignKey]: { not: null, notIn: allowedKeys },
+        [stateKey]: { not: allowedState },
+      },
+    });
+
+    if (shows.length > 0) {
+      await this.client.show.updateMany({
+        data: { [foreignKey]: null, [stateKey]: allowedState },
+        where: { id: { in: shows.map(s => s.id) } },
+      });
+      await Promise.all(
+        shows.map(
+          s => this.events.fromShowChanges(s, { [foreignKey]: null, [stateKey]: allowedState }),
+        ),
+      );
+    }
   }
 }
