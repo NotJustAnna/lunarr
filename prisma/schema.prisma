@@ -87,6 +87,7 @@ model Show {
   tvdbId          String?           @unique() @map("show_tvdb_id")
   tvRageId        String?           @unique() @map("show_tvrage_id")
   tvMazeId        String?           @unique() @map("show_tvmaze_id")
+  imdbId          String?           @unique() @map("show_imdb_id")
 
   jellyfinState   JellyfinDataState @default(NONE) @map("show_jellyfin_state")
   sonarrState     SonarrDataState   @default(NONE) @map("show_sonarr_state")
