@@ -1,6 +1,6 @@
 import { Service } from 'typedi';
 import { RadarrMovie } from '@/types/radarr/api/RadarrMovie';
-import { Movie, RadarrDataState } from '@/prisma-client';
+import { Movie, RadarrDataState } from '@prisma/client';
 import { MoviesRepository } from '@/repositories/movies';
 
 @Service()

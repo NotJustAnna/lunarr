@@ -6,7 +6,7 @@ import { SonarrSeries } from '@/types/sonarr/api/SonarrSeries';
 import { SonarrEpisode } from '@/types/sonarr/api/SonarrEpisode';
 import { withProgress } from '@/common/utils/progress';
 import { SonarrIntegrationService } from '@/services/integrations/sonarr';
-import { ShowSeason } from '@/prisma-client';
+import { ShowSeason } from '@prisma/client';
 import { SonarrSeason } from '@/types/sonarr/api/SonarrSeason';
 
 export class SyncSonarrJob implements Job {

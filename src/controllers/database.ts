@@ -5,7 +5,7 @@ import {
   RadarrDataState,
   SonarrDataState,
   SonarrEpisodeDataState,
-} from '@/prisma-client';
+} from '@prisma/client';
 import { createLogger } from '@/common/logger';
 
 @Service()

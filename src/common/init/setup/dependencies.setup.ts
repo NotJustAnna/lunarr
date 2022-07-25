@@ -1,6 +1,6 @@
 import { AsyncInit } from '@/common/init/interfaces';
 import { Container, Service } from 'typedi';
-import { PrismaClient } from '@/prisma-client';
+import { PrismaClient } from '@prisma/client';
 import { localGenerator, NanoflakeLocalGenerator } from 'nanoflakes';
 
 @Service()

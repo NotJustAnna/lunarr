@@ -9,13 +9,14 @@
 # Documentation here: https://yarnpkg.com/features/zero-installs
 !.yarn/cache
 #.pnp.*
+/node_modules/
 /dist/
 /.idea/
 /.vscode/
 /.env
 /public/
 /src/generated/
-
-scripts/raw_logs/
-scripts/merged/
-scripts/lookup/
+/scratches/
+/scripts/raw_logs/
+/scripts/merged/
+/scripts/lookup/

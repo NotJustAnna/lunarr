@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import { Movie, OmbiRequestDataState, Show } from '@/prisma-client';
+import { Movie, OmbiRequestDataState, Show } from '@prisma/client';
 import { MovieRequest } from '@/types/ombi/api/GetMovieRequests';
 import { MoviesRepository } from '@/repositories/movies';
 import { TvRequest } from '@/types/ombi/api/GetTvRequests';

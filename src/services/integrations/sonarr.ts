@@ -2,7 +2,7 @@ import { Service } from 'typedi';
 import { SonarrSeries } from '@/types/sonarr/api/SonarrSeries';
 import { SonarrSeason } from '@/types/sonarr/api/SonarrSeason';
 import { SonarrEpisode } from '@/types/sonarr/api/SonarrEpisode';
-import { Show, ShowEpisode, ShowSeason, SonarrDataState, SonarrEpisodeDataState } from '@/prisma-client';
+import { Show, ShowEpisode, ShowSeason, SonarrDataState, SonarrEpisodeDataState } from '@prisma/client';
 import { ShowsRepository } from '@/repositories/shows';
 import { ShowSeasonsRepository } from '@/repositories/showSeasons';
 import { ShowEpisodesRepository } from '@/repositories/showEpisodes';
