@@ -1,14 +1,14 @@
 import { Service } from 'typedi';
 import { createLogger } from '@/common/logger';
 import process from 'process';
-import { MoviesRepository } from '@/repositories/movies';
 import { SyncRadarrJob } from '@/jobs/sync-radarr';
+import { RadarrIntegrationService } from '@/services/integrations/radarr';
 
 @Service()
 export class RadarrIntegration {
   private static readonly logger = createLogger('RadarrIntegration');
 
-  constructor(private readonly movies: MoviesRepository) {
+  constructor(private readonly radarr: RadarrIntegrationService) {
     const url = process.env.RADARR_URL!;
     const apiKey = process.env.RADARR_API_KEY!;
 
@@ -21,7 +21,7 @@ export class RadarrIntegration {
       }
     } else {
       // TODO Register job
-      new SyncRadarrJob(this.movies, url, apiKey);
+      new SyncRadarrJob(this.radarr, url, apiKey);
     }
   }
 }

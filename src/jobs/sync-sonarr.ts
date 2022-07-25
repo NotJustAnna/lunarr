@@ -2,19 +2,19 @@ import { Job } from '@/common/jobs';
 import { createLogger } from '@/common/logger';
 import { attempt } from '@/common/utils/attempt';
 import axios, { AxiosInstance } from 'axios';
-import { ShowsRepository } from '@/repositories/shows';
 import { SonarrSeries } from '@/types/sonarr/api/SonarrSeries';
 import { SonarrEpisode } from '@/types/sonarr/api/SonarrEpisode';
 import { withProgress } from '@/common/utils/progress';
-import { ShowEpisodesRepository } from '@/repositories/showEpisodes';
+import { SonarrIntegrationService } from '@/services/integrations/sonarr';
+import { ShowSeason } from '@/prisma-client';
+import { SonarrSeason } from '@/types/sonarr/api/SonarrSeason';
 
 export class SyncSonarrJob implements Job {
   private static readonly logger = createLogger('Job "Sync Sonarr"');
   private api: AxiosInstance;
 
   constructor(
-    private readonly shows: ShowsRepository,
-    private readonly showEpisodes: ShowEpisodesRepository,
+    private readonly sonarr: SonarrIntegrationService,
     sonarrUrl: string,
     sonarrApiKey: string,
   ) {
@@ -37,8 +37,27 @@ export class SyncSonarrJob implements Job {
         const r = await attempt(3, () => this.api.get<SonarrEpisode[]>(`/api/episode`, {
           params: { seriesId: s.id },
         }));
-        const show = await this.shows.upsertFromSonarr(s);
-        await this.showEpisodes.batchUpdateEpisodes(show.id, r.data);
+
+        const show = await this.sonarr.syncShow(s);
+        const seasons = await Promise.all(s.seasons.map(season => this.sonarr.syncSeason(show.id, season)));
+
+        const seasonIdByNumber = seasons.reduce((acc, s) => {
+          acc[s.number] = s.id;
+          return acc;
+        }, {} as Record<number, ShowSeason['id']>);
+
+        await Promise.all(r.data.map(e => this.sonarr.syncEpisode(seasonIdByNumber[e.seasonNumber], e)));
+
+        const sonarrSeasonByNumber = s.seasons.reduce((acc, s) => {
+          acc[s.seasonNumber] = s;
+          return acc;
+        }, {} as Record<number, SonarrSeason>);
+
+        await this.sonarr.untrackSeasonsAndEpisodes(
+          show.id,
+          seasons.map(s => ({ id: s.id, external: sonarrSeasonByNumber[s.number] })),
+          r.data,
+        );
       }),
       500,
       (done, total) => {
@@ -47,6 +66,6 @@ export class SyncSonarrJob implements Job {
         SyncSonarrJob.logger.info(`Synced episodes of ${done} of ${total} series. (${progress}% done)`);
       },
     );
-    await this.shows.ensureOnlySonarrShows(series);
+    await this.sonarr.untrackShows(series);
   }
 }

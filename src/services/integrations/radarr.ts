@@ -7,7 +7,7 @@ import { MoviesRepository } from '@/repositories/movies';
 export class RadarrIntegrationService {
   constructor(private readonly movies: MoviesRepository) {}
 
-  async sync(external: RadarrMovie) {
+  async syncMovie(external: RadarrMovie) {
     const changes: Partial<Movie> = {
       radarrId: String(external.id),
       tmdbId: (external.tmdbId && external.tmdbId !== 0) ? String(external.tmdbId) : undefined,
@@ -21,8 +21,8 @@ export class RadarrIntegrationService {
     return this.movies.sync(changes);
   }
 
-  async untrack(allowedExternal: RadarrMovie[]) {
-    return this.movies.untrack(
+  async untrackMovies(allowedExternal: RadarrMovie[]) {
+    return this.movies.foreignUntrack(
       'radarrId',
       allowedExternal.map(m => String(m.id)),
       'radarrState',

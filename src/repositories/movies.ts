@@ -75,7 +75,7 @@ export class MoviesRepository {
     return data;
   }
 
-  async untrack<Key extends keyof Movie, State extends keyof Movie>(
+  async foreignUntrack<Key extends keyof Movie, State extends keyof Movie>(
     foreignKey: Key, allowedKeys: MovieWhereInput[Key][],
     stateKey: State, allowedState: MovieWhereInput[State],
   ) {

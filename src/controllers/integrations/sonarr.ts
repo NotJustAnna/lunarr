@@ -1,19 +1,15 @@
 import { Service } from 'typedi';
 import { createLogger } from '@/common/logger';
 import process from 'process';
-import { ShowsRepository } from '@/repositories/shows';
-import { ShowEpisodesRepository } from '@/repositories/showEpisodes';
 import { SyncSonarrJob } from '@/jobs/sync-sonarr';
+import { SonarrIntegrationService } from '@/services/integrations/sonarr';
 
 @Service()
 export class SonarrIntegration {
 
   private static readonly logger = createLogger('SonarrIntegration');
 
-  constructor(
-    private readonly shows: ShowsRepository,
-    private readonly showEpisodes: ShowEpisodesRepository,
-  ) {
+  constructor(private readonly sonarr: SonarrIntegrationService) {
     const url = process.env.SONARR_URL!;
     const apiKey = process.env.SONARR_API_KEY!;
 
@@ -26,7 +22,7 @@ export class SonarrIntegration {
       }
     } else {
       // TODO Register job
-      new SyncSonarrJob(this.shows, this.showEpisodes, url, apiKey);
+      new SyncSonarrJob(this.sonarr, url, apiKey);
     }
   }
 }
