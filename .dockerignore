@@ -1,0 +1,12 @@
+/.yarn
+/dist
+/node_modules
+/public
+/scratches
+/src/generated
+/.env
+/.dockerignore
+/frontend/.yarn
+/frontend/node_modules
+/frontend/build
+/frontend/src/generated

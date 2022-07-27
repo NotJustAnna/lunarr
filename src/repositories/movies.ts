@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import { createLogger } from '@/common/logger';
+import { createLogger } from '@/app/logger';
 import { Movie, Prisma, PrismaClient } from '@prisma/client';
 import { EventEmitterService } from '@/services/eventEmitter';
 import MovieWhereInput = Prisma.MovieWhereInput;
