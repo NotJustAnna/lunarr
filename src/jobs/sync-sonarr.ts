@@ -1,10 +1,10 @@
-import { Job } from '@/common/jobs';
-import { createLogger } from '@/common/logger';
-import { attempt } from '@/common/utils/attempt';
+import { Job } from '@/app/jobs';
+import { createLogger } from '@/app/logger';
+import { attempt } from '@/utils/attempt';
 import axios, { AxiosInstance } from 'axios';
 import { SonarrSeries } from '@/types/sonarr/api/SonarrSeries';
 import { SonarrEpisode } from '@/types/sonarr/api/SonarrEpisode';
-import { withProgress } from '@/common/utils/progress';
+import { withProgress } from '@/utils/progress';
 import { SonarrIntegrationService } from '@/services/integrations/sonarr';
 import { ShowSeason } from '@prisma/client';
 import { SonarrSeason } from '@/types/sonarr/api/SonarrSeason';

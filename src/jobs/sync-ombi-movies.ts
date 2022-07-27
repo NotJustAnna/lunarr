@@ -1,6 +1,6 @@
-import { Job } from '@/common/jobs';
-import { createLogger } from '@/common/logger';
-import { attempt } from '@/common/utils/attempt';
+import { Job } from '@/app/jobs';
+import { createLogger } from '@/app/logger';
+import { attempt } from '@/utils/attempt';
 import axios, { AxiosInstance } from 'axios';
 import { MovieRequest } from '@/types/ombi/api/GetMovieRequests';
 import { OmbiIntegrationService } from '@/services/integrations/ombi';

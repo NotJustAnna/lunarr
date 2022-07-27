@@ -1,7 +1,7 @@
-import { Job } from '@/common/jobs';
+import { Job } from '@/app/jobs';
 import { RadarrMovie } from '@/types/radarr/api/RadarrMovie';
-import { createLogger } from '@/common/logger';
-import { attempt } from '@/common/utils/attempt';
+import { createLogger } from '@/app/logger';
+import { attempt } from '@/utils/attempt';
 import axios, { AxiosInstance } from 'axios';
 import { RadarrIntegrationService } from '@/services/integrations/radarr';
 

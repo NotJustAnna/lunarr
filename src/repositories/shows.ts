@@ -1,4 +1,4 @@
-import { createLogger } from '@/common/logger';
+import { createLogger } from '@/app/logger';
 import { Prisma, PrismaClient, Show } from '@prisma/client';
 import { Service } from 'typedi';
 import { EventEmitterService } from '@/services/eventEmitter';
@@ -35,6 +35,10 @@ export class ShowsRepository {
       finders.push({ tvMazeId: changes.tvMazeId });
     }
     return { OR: finders };
+  }
+
+  async all() {
+    return this.client.show.findMany();
   }
 
   async sync(changes: Partial<Show>) {
