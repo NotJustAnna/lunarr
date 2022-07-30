@@ -5,6 +5,7 @@
 /scratches
 /src/generated
 /.env
+/config.json
 /.dockerignore
 /frontend/.yarn
 /frontend/node_modules

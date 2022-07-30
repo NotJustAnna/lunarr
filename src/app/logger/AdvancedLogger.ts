@@ -21,10 +21,23 @@ export class AdvancedLogger extends SimpleLogger {
     );
   }
 
+  private static readonly magics: Record<string, (param: string, value: string) => string> = {
+    hl: (language, code) => highlight(code, { language, theme: AdvancedLogger.theme }),
+    chalk: (param, value) => {
+      const f = param.split('-').reduce<Chalk>((c: any, str) => {
+        if (str in c) {
+          return c[str] as Chalk;
+        }
+        console.info(`Unknown chalk function: ${str}`);
+        return c;
+      }, chalk);
+      return f(value);
+    },
+  };
+  private static readonly toBeReplacedRegExp = /<TO-BE-REPLACED-(\d+)>/g;
+
   protected handleMessage(level: LogLevel, msg: string): string {
-    const highlighted = msg.replace(SimpleLogger.hlTagRegExp, (_, language, value) => {
-      return highlight(value, { language, theme: AdvancedLogger.theme });
-    });
+    const highlighted = this.handleHighlight(msg);
     return AdvancedLogger.levelColor[level](highlighted);
   }
 
@@ -42,14 +55,18 @@ export class AdvancedLogger extends SimpleLogger {
       .join('\n')
       .trimEnd();
 
+    return this.handleHighlight(dumped);
+  }
+
+  private handleHighlight(str: string) {
     // This next step rewrites the partially highlighted string using regex,
     // and stores further pieces of code inside an array. Then, the rewritten
     // string is highlighted as YAML using cli-highlight.
-    const toBeHighlighted: [string, string][] = [];
+    const toBeHighlighted: string[] = [];
     const partiallyHighlighted = highlight(
-      dumped.replace(SimpleLogger.hlTagRegExp, (_, language, value) => {
-        const s = `<HL-TO-BE-REPLACED-${toBeHighlighted.length}>`;
-        toBeHighlighted.push([language, value]);
+      str.replace(SimpleLogger.magicTagRegExp, (_, type, param, value) => {
+        const s = `<TO-BE-REPLACED-${toBeHighlighted.length}>`;
+        toBeHighlighted.push(AdvancedLogger.magics[type](param, value));
         return s;
       }),
       { language: 'yml', theme: AdvancedLogger.theme },
@@ -63,13 +80,10 @@ export class AdvancedLogger extends SimpleLogger {
     // Lastly, the string is rewritten again using Regex in order to add back
     // the previously removed (and stored) strings, each being highlighted
     // using their defined language.
-    return partiallyHighlighted.replace(AdvancedLogger.hlToBeReplacedRegExp, (_, index) => {
-      const [language, code] = toBeHighlighted[Number(index)];
-      return highlight(code, { language, theme: AdvancedLogger.theme });
+    return partiallyHighlighted.replace(AdvancedLogger.toBeReplacedRegExp, (_, index) => {
+      return toBeHighlighted[Number(index)];
     });
   }
-
-  private static readonly hlToBeReplacedRegExp = /<HL-TO-BE-REPLACED-(\d+)>/g;
 
   private static readonly theme: Theme = {
     keyword: chalk.blueBright,
