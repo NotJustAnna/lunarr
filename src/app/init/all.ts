@@ -6,7 +6,7 @@
  * Abstract classes should not be exported and will break initialization if added.
  */
 export { DatabaseInitializer } from './database';
-export { ExpressInitializer } from './express';
+export { HttpInitializer } from './http';
 
 export { BazarrIntegration } from './integrations/bazarr';
 // export { DiscordIntegration } from './integrations/discord';

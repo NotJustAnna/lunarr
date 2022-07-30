@@ -53,6 +53,6 @@
   "scripts": {
     "build": "rimraf ./dist && tsc && tsconfig-replace-paths && ./scripts/copy-assets-from-src.sh",
     "start": "yarn build && node dist/index.js",
-    "update-frontend": "./scripts/update-frontend.sh"
+    "frontend": "cd frontend && yarn"
   }
 }

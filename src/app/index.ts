@@ -1,34 +1,27 @@
 import 'reflect-metadata';
-import * as setupToInit from '@/app/init/setup/all';
-import * as registeredControllers from '@/app/init/all';
-import { Container } from 'typedi';
-import { hasInit } from '@/app/init/interfaces';
+import * as batchSetup from '@/app/init/setup/all';
+import * as batchInit from '@/app/init/all';
 import { createLogger } from '@/app/logger';
+import { batchInitialize } from '@/utils/initializer';
+import { ExitCode } from '@/utils/exitCode';
 
 export async function initApp() {
   const logger = createLogger('Application');
   logger.info('Starting application...');
 
-  await Promise.all(Object.values(setupToInit).map(async (c) => {
-    try {
-      const instance = Container.get(c);
-      Container.remove(c);
-      if (hasInit(instance)) {
-        await instance.init();
-      }
-    } catch (error) {
-      logger.error(`Error while setting up (error on ${c.name})`, { error });
-    }
-  }));
-  await Promise.all(Object.values(registeredControllers).map(async (c) => {
-    try {
-      const instance = Container.get(c);
-      if (hasInit(instance)) {
-        await instance.init();
-      }
-    } catch (error) {
-      logger.error(`Error while initializing ${c.name}`, { error });
-    }
-  }));
+  const setup = await batchInitialize(batchSetup);
+  if (setup.errors.length > 0) {
+    const errors = setup.errors, count = errors.length;
+    logger.error(`Set-up phase failed with ${count} error${count === 1 ? '' : 's'}.`, { errors });
+    process.exit(ExitCode.FATAL_UNRECOVERABLE_ERROR);
+  }
+
+  const init = await batchInitialize(batchInit);
+  if (init.errors.length > 0) {
+    const errors = init.errors, count = errors.length;
+    logger.error(`Init phase failed with ${count} error${count === 1 ? '' : 's'}.`, { errors });
+    process.exit(ExitCode.FATAL_UNRECOVERABLE_ERROR);
+  }
+
   logger.info('Application started');
 }

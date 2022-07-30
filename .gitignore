@@ -14,6 +14,7 @@
 /.idea/
 /.vscode/
 /.env
+/config.json
 /public/
 /src/generated/
 /scratches/

@@ -1,5 +1,7 @@
 import express, { Express, Router } from 'express';
 
+const _metadata = Symbol('_metadata');
+
 export class ControllerMetadata {
   routerSetup: ((instance: any, router: Router) => void)[] = [];
   basePath?: string;
@@ -13,25 +15,23 @@ export class ControllerMetadata {
       app.use(router);
     }
   }
-}
 
-const controllerMetadata = Symbol('controllerMetadata');
-
-export function getControllerMetadata(constructor: any): ControllerMetadata | null {
-  if (constructor) {
-    return constructor[controllerMetadata] as ControllerMetadata ?? null;
-  }
-  return null;
-}
-
-export function getOrCreateControllerMetadata(constructor: any): ControllerMetadata {
-  if (constructor) {
-    let metadata = constructor[controllerMetadata] as ControllerMetadata;
-    if (!metadata) {
-      metadata = new ControllerMetadata();
-      constructor[controllerMetadata] = metadata;
+  static getOrCreate(constructor: any): ControllerMetadata {
+    if (constructor) {
+      let metadata = constructor[_metadata] as ControllerMetadata;
+      if (!metadata) {
+        metadata = new ControllerMetadata();
+        constructor[_metadata] = metadata;
+      }
+      return metadata;
     }
-    return metadata;
+    throw new Error('constructor is null');
   }
-  throw new Error('constructor is null');
+
+  static get(constructor: any): ControllerMetadata | null {
+    if (constructor) {
+      return constructor[_metadata] as ControllerMetadata ?? null;
+    }
+    return null;
+  }
 }

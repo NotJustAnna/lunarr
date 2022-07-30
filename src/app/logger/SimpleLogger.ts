@@ -40,8 +40,10 @@ export class SimpleLogger extends Logger {
     );
   }
 
+  protected static readonly magicTagRegExp = /<(hl|chalk) +([\w-]+) *>([\s\S]+?)<\/\1 *>/g;
+
   protected handleMessage(level: LogLevel, msg: string) {
-    return msg.replace(SimpleLogger.hlTagRegExp, '$2'); // Hook used by AdvancedSimpleLogger
+    return msg.replace(SimpleLogger.magicTagRegExp, '$2'); // Hook used by AdvancedSimpleLogger
   }
 
   protected handleMetadata(obj: object) {
@@ -50,10 +52,8 @@ export class SimpleLogger extends Logger {
       .map((v) => `  ${v}`)
       .join('\n')
       .trimEnd()
-      .replace(SimpleLogger.hlTagRegExp, '$2');
+      .replace(SimpleLogger.magicTagRegExp, '$2');
   }
-
-  protected static readonly hlTagRegExp = /<hl +(\w+) *>([\s\S]+?)<\/hl *>/g;
 
   protected static readonly yamlDumpOptions: DumpOptions = {
     lineWidth: 120,
