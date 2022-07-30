@@ -1,6 +1,6 @@
 import 'reflect-metadata';
-import * as batchSetup from '@/app/init/setup/all';
-import * as batchInit from '@/app/init/all';
+import * as batchSetup from '@/init/setup/all';
+import * as batchInit from '@/init/all';
 import { createLogger } from '@/app/logger';
 import { batchInitialize } from '@/utils/initializer';
 import { ExitCode } from '@/utils/exitCode';
