@@ -1,6 +1,6 @@
-import { ConfigurationChild } from '@/utils/config';
+import { AbstractConfigurationChild } from '@/utils/config';
 
-export class LidarrConfig extends ConfigurationChild {
+export class LidarrConfig extends AbstractConfigurationChild {
   url?: string;
   apiKey?: string;
 

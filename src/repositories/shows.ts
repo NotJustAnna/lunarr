@@ -1,7 +1,7 @@
 import { createLogger } from '@/app/logger';
 import { Prisma, PrismaClient, Show } from '@prisma/client';
 import { Service } from 'typedi';
-import { EventEmitterService } from '@/services/eventEmitter';
+import { ChangeSetService } from '@/services/events/changeSet';
 import ShowWhereInput = Prisma.ShowWhereInput;
 
 @Service()
@@ -10,7 +10,7 @@ export class ShowsRepository {
 
   constructor(
     private readonly client: PrismaClient,
-    private readonly events: EventEmitterService,
+    private readonly events: ChangeSetService,
   ) {
   }
 

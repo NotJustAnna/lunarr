@@ -1,13 +1,13 @@
 import { Service } from 'typedi';
 import { Prisma, PrismaClient, Show, ShowSeason } from '@prisma/client';
-import { EventEmitterService } from '@/services/eventEmitter';
+import { ChangeSetService } from '@/services/events/changeSet';
 import ShowSeasonWhereInput = Prisma.ShowSeasonWhereInput;
 
 @Service()
 export class ShowSeasonsRepository {
   constructor(
     private readonly client: PrismaClient,
-    private readonly events: EventEmitterService,
+    private readonly events: ChangeSetService,
   ) {
   }
 

@@ -1,7 +1,7 @@
 import { Service } from 'typedi';
 import { createLogger } from '@/app/logger';
 import { Movie, Prisma, PrismaClient } from '@prisma/client';
-import { EventEmitterService } from '@/services/eventEmitter';
+import { ChangeSetService } from '@/services/events/changeSet';
 import MovieWhereInput = Prisma.MovieWhereInput;
 
 @Service()
@@ -10,7 +10,7 @@ export class MoviesRepository {
 
   constructor(
     private readonly client: PrismaClient,
-    private readonly events: EventEmitterService,
+    private readonly events: ChangeSetService,
   ) {
   }
 

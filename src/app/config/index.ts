@@ -10,71 +10,54 @@ import { PlexConfig } from '@/app/config/plex';
 import { RadarrConfig } from '@/app/config/radarr';
 import { SonarrConfig } from '@/app/config/sonarr';
 import { HttpConfig } from './http';
-import { Configuration } from '@/utils/config';
+import { AbstractConfiguration } from '@/utils/config';
 
-export class FlixConfig extends Configuration {
-
+export class Config extends AbstractConfiguration {
+  @Config.Child()
   @Type(() => BazarrConfig)
-  bazarr: BazarrConfig;
+  bazarr = new BazarrConfig();
 
+  @Config.Child()
   @Type(() => DiscordConfig)
-  discord: DiscordConfig;
+  discord = new DiscordConfig();
 
+  @Config.Child()
   @Type(() => HttpConfig)
-  http: HttpConfig;
+  http = new HttpConfig();
 
+  @Config.Child()
   @Type(() => JellyfinConfig)
-  jellyfin: JellyfinConfig;
+  jellyfin = new JellyfinConfig();
 
+  @Config.Child()
   @Type(() => LidarrConfig)
-  lidarr: LidarrConfig;
+  lidarr = new LidarrConfig();
 
+  @Config.Child()
   @Type(() => OmbiConfig)
-  ombi: OmbiConfig;
+  ombi = new OmbiConfig();
 
+  @Config.Child()
   @Type(() => OverseerrConfig)
-  overseerr: OverseerrConfig;
+  overseerr = new OverseerrConfig();
 
+  @Config.Child()
   @Type(() => PlexConfig)
-  plex: PlexConfig;
+  plex = new PlexConfig();
 
+  @Config.Child()
   @Type(() => RadarrConfig)
-  radarr: RadarrConfig;
+  radarr = new RadarrConfig();
 
+  @Config.Child()
   @Type(() => SonarrConfig)
-  sonarr: SonarrConfig;
+  sonarr = new SonarrConfig();
 
+  @Config.Child()
   @Type(() => WebhooksConfig)
-  webhooks: WebhooksConfig;
+  webhooks = new WebhooksConfig();
 
-  constructor() {
-    super();
-    this.bazarr = new BazarrConfig();
-    this.discord = new DiscordConfig();
-    this.http = new HttpConfig();
-    this.jellyfin = new JellyfinConfig();
-    this.lidarr = new LidarrConfig();
-    this.ombi = new OmbiConfig();
-    this.overseerr = new OverseerrConfig();
-    this.plex = new PlexConfig();
-    this.radarr = new RadarrConfig();
-    this.sonarr = new SonarrConfig();
-    this.webhooks = new WebhooksConfig();
-  }
-
-  protected register() {
-    this.children(
-      this.bazarr,
-      this.discord,
-      this.http,
-      this.jellyfin,
-      this.lidarr,
-      this.ombi,
-      this.overseerr,
-      this.plex,
-      this.radarr,
-      this.sonarr,
-      this.webhooks,
-    );
+  static loadConfig(file: string) {
+    return AbstractConfiguration.load(Config, file);
   }
 }

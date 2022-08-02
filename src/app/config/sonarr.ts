@@ -1,6 +1,6 @@
-import { ConfigurationChild } from '@/utils/config';
+import { AbstractConfigurationChild } from '@/utils/config';
 
-export class SonarrConfig extends ConfigurationChild {
+export class SonarrConfig extends AbstractConfigurationChild {
   url?: string;
   apiKey?: string;
 

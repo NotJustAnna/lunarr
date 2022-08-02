@@ -1,6 +1,6 @@
-import { ConfigurationChild } from '@/utils/config';
+import { AbstractConfigurationChild } from '@/utils/config';
 
-export class PlexConfig extends ConfigurationChild {
+export class PlexConfig extends AbstractConfigurationChild {
 
   overrideFromEnv() {
 

@@ -1,6 +1,6 @@
-import { ConfigurationChild } from '@/utils/config';
+import { AbstractConfigurationChild } from '@/utils/config';
 
-export class OverseerrConfig extends ConfigurationChild {
+export class OverseerrConfig extends AbstractConfigurationChild {
 
   overrideFromEnv() {
 

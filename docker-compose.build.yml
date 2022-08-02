@@ -1,6 +1,6 @@
 version: '3'
 services:
-  flix:
+  lunarr:
     build:
       context: .
       dockerfile: Dockerfile

@@ -1,6 +1,6 @@
-import { ConfigurationChild } from '@/utils/config';
+import { AbstractConfigurationChild } from '@/utils/config';
 
-export class DiscordConfig extends ConfigurationChild {
+export class DiscordConfig extends AbstractConfigurationChild {
   token?: string;
 
   overrideFromEnv() {

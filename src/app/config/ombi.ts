@@ -1,6 +1,6 @@
-import { ConfigurationChild } from '@/utils/config';
+import { AbstractConfigurationChild } from '@/utils/config';
 
-export class OmbiConfig extends ConfigurationChild {
+export class OmbiConfig extends AbstractConfigurationChild {
   url?: string;
   apiKey?: string;
 
