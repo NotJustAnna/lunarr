@@ -2,8 +2,7 @@ import { AsyncInit } from '@/app/init/interfaces';
 import { Container, Service } from 'typedi';
 import { PrismaClient } from '@prisma/client';
 import { localGenerator, NanoflakeLocalGenerator } from 'nanoflakes';
-import { FlixConfig } from '@/app/config';
-import { Configuration } from '@/utils/config';
+import { Config } from '@/app/config';
 import { BazarrConfig } from '@/app/config/bazarr';
 import { DiscordConfig } from '@/app/config/discord';
 import { HttpConfig } from '@/app/config/http';
@@ -22,10 +21,10 @@ export class Dependencies implements AsyncInit {
     Container.set(NanoflakeLocalGenerator, localGenerator(1653700000000, 0));
     Container.set(PrismaClient, new PrismaClient());
 
-    const config = await Configuration.load(FlixConfig, 'config.json');
+    const config = await Config.loadConfig('config.json');
     config.overrideFromEnv();
     await config.save();
-    Container.set(FlixConfig, config);
+    Container.set(Config, config);
     Container.set(BazarrConfig, config.bazarr);
     Container.set(DiscordConfig, config.discord);
     Container.set(HttpConfig, config.http);

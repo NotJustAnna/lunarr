@@ -1,6 +1,6 @@
-import { ConfigurationChild } from '@/utils/config';
+import { AbstractConfigurationChild } from '@/utils/config';
 
-export class RadarrConfig extends ConfigurationChild {
+export class RadarrConfig extends AbstractConfigurationChild {
   url?: string;
   apiKey?: string;
 

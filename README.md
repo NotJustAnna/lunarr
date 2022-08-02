@@ -1,4 +1,4 @@
-# FlixBot
+# Lunarr
 
 ## Environment Variables
 

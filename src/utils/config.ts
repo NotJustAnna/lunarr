@@ -7,39 +7,59 @@ const _parent = Symbol('_parent');
 const _children = Symbol('_children');
 const _file = Symbol('_file');
 
-export abstract class Configuration {
+export abstract class AbstractConfiguration {
   private static readonly logger = createLogger('Configuration');
 
   @Exclude()
-  [_children]: ConfigurationChild[] = [];
+  [_children]: AbstractConfigurationChild[] = [];
 
   @Exclude()
   [_file]!: string;
 
-  static async load<T extends Configuration>(cls: Constructable<T>, file: string): Promise<T> {
+  static async load<T extends AbstractConfiguration>(cls: Constructable<T>, file: string): Promise<T> {
     try {
       const config = plainToInstance(cls, await fs.readJson(file));
-      config[_file] = file;
-      config.register();
+      AbstractConfiguration.postInit(config, file);
       return config;
     } catch (error: any) {
       // don't warn if file not found
       if (error.code !== 'ENOENT') {
-        Configuration.logger.error('Failed to load config', { error });
+        AbstractConfiguration.logger.error('Failed to load config', { error });
       }
       const config = new cls();
-      config[_file] = file;
-      config.register();
+      AbstractConfiguration.postInit(config, file);
       return config;
     }
   }
 
-  async save() {
-    try {
-      const json = instanceToPlain(this);
-      await fs.writeJson(this[_file], json, { spaces: 2 });
-    } catch (error) {
-      Configuration.logger.error('Failed to save config', { error });
+  static Child() {
+    return <C extends AbstractConfiguration>(target: C, propertyKey: string) => {
+      const cls = (target.constructor as any);
+      if (!cls[_children]) cls[_children] = [];
+      cls[_children].push((target: any) => target[propertyKey]);
+    };
+  }
+
+  private static postInit(config: AbstractConfiguration, file: string) {
+    config[_file] = file;
+
+    const cls = (config.constructor as any);
+    if (!cls[_children]) cls[_children] = [];
+    for (const getChild of cls[_children]) {
+      const child = getChild(config);
+      AbstractConfiguration.postInitChild(config, child);
+    }
+  }
+
+  private static postInitChild(parent: AbstractConfiguration, config: AbstractConfigurationChild) {
+    config[_parent] = parent;
+    parent[_children].push(config);
+
+    const cls = (config.constructor as any);
+    if (!cls[_children]) cls[_children] = [];
+    for (const getChild of cls[_children]) {
+      const child = getChild(config);
+      AbstractConfiguration.postInitChild(parent, child);
     }
   }
 
@@ -49,35 +69,32 @@ export abstract class Configuration {
     }
   }
 
-  protected register() {
-  }
-
-  protected children<T extends ConfigurationChild>(...children: T[]) {
-    for (let child of children) {
-      child[_parent] = this;
-      this[_children].push(child);
+  async save() {
+    try {
+      const json = instanceToPlain(this);
+      await fs.writeJson(this[_file], json, { spaces: 2 });
+    } catch (error) {
+      AbstractConfiguration.logger.error('Failed to save config', { error });
     }
   }
 }
 
-export abstract class ConfigurationChild {
-  [_parent]!: Configuration;
+export abstract class AbstractConfigurationChild {
+  [_parent]!: AbstractConfiguration;
 
   overrideFromEnv(): void {
     // do nothing
   }
 
-  save(): void {
-    this[_parent].save();
+  static Child() {
+    return <C extends AbstractConfigurationChild>(target: C, propertyKey: string) => {
+      const cls = (target.constructor as any);
+      if (!cls[_children]) cls[_children] = [];
+      cls[_children].push((target: any) => target[propertyKey]);
+    };
   }
 
-  protected children<T extends ConfigurationChild>(children: T[]) {
-    for (let child of children) {
-      child[_parent] = this[_parent];
-      this[_parent][_children].push(child);
-    }
-  }
-
-  protected register() {
+  save(): Promise<void> {
+    return this[_parent].save();
   }
 }

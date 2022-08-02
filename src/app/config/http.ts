@@ -1,6 +1,6 @@
-import { ConfigurationChild } from '@/utils/config';
+import { AbstractConfigurationChild } from '@/utils/config';
 
-export class HttpConfig extends ConfigurationChild {
+export class HttpConfig extends AbstractConfigurationChild {
   port: number = 4000;
 
   overrideFromEnv() {

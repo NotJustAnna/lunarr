@@ -1,6 +1,6 @@
-import { ConfigurationChild } from '@/utils/config';
+import { AbstractConfigurationChild } from '@/utils/config';
 
-export class BazarrConfig extends ConfigurationChild {
+export class BazarrConfig extends AbstractConfigurationChild {
   url?: string;
   apiKey?: string;
 

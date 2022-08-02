@@ -1,6 +1,6 @@
-import { ConfigurationChild } from '@/utils/config';
+import { AbstractConfigurationChild } from '@/utils/config';
 
-export class JellyfinConfig extends ConfigurationChild {
+export class JellyfinConfig extends AbstractConfigurationChild {
   url?: string;
   apiKey?: string;
 
