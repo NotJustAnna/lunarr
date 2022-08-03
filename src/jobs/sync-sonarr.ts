@@ -23,7 +23,7 @@ export class SyncSonarrJob extends AbstractJob {
     super({
       id: 'sync-sonarr',
       name: 'Sync series from Sonarr',
-      duration: { minutes: 1 },
+      interval: { minutes: 10 },
       runImmediately: true,
     });
 

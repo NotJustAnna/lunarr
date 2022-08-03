@@ -4,7 +4,7 @@ import { createLogger } from '@/app/logger';
 export interface JobOptions {
   id: string;
   name: string;
-  duration: Duration;
+  interval: Duration;
   runImmediately?: boolean;
 }
 
@@ -19,7 +19,7 @@ export abstract class AbstractJob {
 
   id: string;
   name: string;
-  duration: Duration;
+  interval: Duration;
   nextExecution?: Date;
   executing = false;
   private timeout?: NodeJS.Timeout;
@@ -27,7 +27,7 @@ export abstract class AbstractJob {
   protected constructor(options: JobOptions) {
     this.id = options.id;
     this.name = options.name;
-    this.duration = options.duration;
+    this.interval = options.interval;
     if (options.runImmediately) {
       // this needs to be called after the constructor
       setImmediate(() => this.executeNow());
@@ -85,9 +85,9 @@ export abstract class AbstractJob {
       return;
     }
     this.stop();
-    this.timeout = setTimeout(() => this.executeNow(), toMilliseconds(this.duration));
+    this.timeout = setTimeout(() => this.executeNow(), toMilliseconds(this.interval));
     const date = new Date();
-    date.setTime(date.getTime() + toMilliseconds(this.duration));
+    date.setTime(date.getTime() + toMilliseconds(this.interval));
     this.nextExecution = date;
   }
 
@@ -95,7 +95,7 @@ export abstract class AbstractJob {
     return {
       id: this.id,
       name: this.name,
-      duration: this.duration,
+      duration: this.interval,
       nextExecution: this.nextExecution,
       status: this.status,
     };
