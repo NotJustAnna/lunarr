@@ -17,7 +17,7 @@ export class SyncRadarrJob extends AbstractJob {
     super({
       id: 'sync-radarr',
       name: 'Sync movies from Radarr',
-      duration: { minutes: 1 },
+      interval: { minutes: 10 },
       runImmediately: true,
     });
 

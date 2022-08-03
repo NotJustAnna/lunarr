@@ -17,7 +17,7 @@ export class SyncOmbiMoviesJob extends AbstractJob {
     super({
       id: 'sync-ombi-movies',
       name: 'Sync Movie requests from Ombi',
-      duration: { minutes: 1 },
+      interval: { minutes: 10 },
       runImmediately: true,
     });
 
