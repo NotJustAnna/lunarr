@@ -1,11 +1,11 @@
-import { Job } from '@/app/jobs';
+import { AbstractJob } from '@/app/jobs';
 import { createLogger } from '@/app/logger';
 import { attempt } from '@/utils/attempt';
 import axios, { AxiosInstance } from 'axios';
 import { TvRequest } from '@/types/ombi/api/GetTvRequests';
 import { OmbiIntegrationService } from '@/services/integrations/ombi';
 
-export class SyncOmbiTvJob implements Job {
+export class SyncOmbiTvJob extends AbstractJob {
   private static readonly logger = createLogger('Job "Sync Ombi TV"');
   private api: AxiosInstance;
 
@@ -14,6 +14,13 @@ export class SyncOmbiTvJob implements Job {
     ombiUrl: string,
     ombiApiKey: string,
   ) {
+    super({
+      id: 'sync-ombi-tv',
+      name: 'Sync TV requests from Ombi',
+      duration: { minutes: 1 },
+      runImmediately: true,
+    });
+
     this.api = axios.create({
       baseURL: ombiUrl,
       headers: { ApiKey: ombiApiKey },

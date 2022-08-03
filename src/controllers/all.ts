@@ -6,3 +6,6 @@
  * Abstract classes should not be exported and will break initialization if added.
  */
 export { ShowsController } from './shows.controller';
+export { JobsController } from './jobs.controller';
+export { WebhooksController } from './webhooks.controller';
+export { FlatAssocController } from './flatAssoc.controller';

@@ -3,13 +3,16 @@ import { createLogger } from '@/app/logger';
 import process from 'process';
 import { SyncSonarrJob } from '@/jobs/sync-sonarr';
 import { SonarrIntegrationService } from '@/services/integrations/sonarr';
+import { JobService } from '@/services/jobs';
 
 @Service()
 export class SonarrIntegration {
-
   private static readonly logger = createLogger('SonarrIntegration');
 
-  constructor(private readonly sonarr: SonarrIntegrationService) {
+  constructor(
+    private readonly sonarr: SonarrIntegrationService,
+    private readonly jobs: JobService,
+  ) {
     const url = process.env.SONARR_URL!;
     const apiKey = process.env.SONARR_API_KEY!;
 
@@ -21,8 +24,7 @@ export class SonarrIntegration {
         SonarrIntegration.logger.error('SONARR_API_KEY environment variable is not set!');
       }
     } else {
-      // TODO Register job
-      new SyncSonarrJob(this.sonarr, url, apiKey);
+      this.jobs.add(new SyncSonarrJob(this.sonarr, url, apiKey));
     }
   }
 }

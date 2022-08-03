@@ -1,4 +1,4 @@
-import { Exclude, instanceToPlain, plainToInstance } from 'class-transformer';
+import { Exclude, instanceToPlain, plainToInstance, Type, TypeHelpOptions, TypeOptions } from 'class-transformer';
 import * as fs from 'fs-extra';
 import { createLogger } from '@/app/logger';
 import { Constructable } from 'typedi';
@@ -32,8 +32,13 @@ export abstract class AbstractConfiguration {
     }
   }
 
-  static Child() {
-    return <C extends AbstractConfiguration>(target: C, propertyKey: string) => {
+  static Child(
+    typeFunction?: (type?: TypeHelpOptions) => Function,
+    options: TypeOptions = {},
+  ) {
+    const TypeDecorator = Type(typeFunction, options);
+    return <C extends AbstractConfiguration>(target: C, propertyKey: string | symbol) => {
+      TypeDecorator(target, propertyKey);
       const cls = (target.constructor as any);
       if (!cls[_children]) cls[_children] = [];
       cls[_children].push((target: any) => target[propertyKey]);

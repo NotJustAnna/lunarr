@@ -16,8 +16,6 @@ export class HttpInitializer implements AsyncInit {
   private static readonly logger = createLogger('HttpInitializer');
 
   constructor(private readonly config: HttpConfig) {
-    config.port = 8080;
-    config.save();
   }
 
   private static async warnIfFrontendNotBuilt() {

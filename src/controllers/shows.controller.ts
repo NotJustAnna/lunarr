@@ -1,10 +1,8 @@
-import { Service } from 'typedi';
 import { Controller, Get } from '@/app/controllers';
 import { Request, Response } from 'express';
 import { ShowsRepository } from '@/repositories/shows';
 
-@Service()
-@Controller('/api/shows')
+@Controller({ path: '/api/shows' })
 export class ShowsController {
   constructor(private readonly shows: ShowsRepository) {
   }
