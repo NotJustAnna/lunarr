@@ -60,7 +60,7 @@ export class ShowsRepository {
       return null;
     }
     if (shows.length === 1) {
-      return shows[0];
+        return shows[0];
     }
     // NOTE: Might be worth debugging why shows got duplicated.
     const data = shows.reduce((show, duplicate) => {

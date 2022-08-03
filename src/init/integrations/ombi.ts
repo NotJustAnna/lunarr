@@ -4,13 +4,16 @@ import process from 'process';
 import { SyncOmbiMoviesJob } from '@/jobs/sync-ombi-movies';
 import { SyncOmbiTvJob } from '@/jobs/sync-ombi-tv';
 import { OmbiIntegrationService } from '@/services/integrations/ombi';
+import { JobService } from '@/services/jobs';
 
 @Service()
 export class OmbiIntegration {
-
   private static readonly logger = createLogger('OmbiIntegration');
 
-  constructor(private readonly ombi: OmbiIntegrationService) {
+  constructor(
+    private readonly ombi: OmbiIntegrationService,
+    private readonly jobs: JobService,
+  ) {
     const url = process.env.OMBI_URL!;
     const apiKey = process.env.OMBI_API_KEY!;
     if (!(url && apiKey)) {
@@ -21,9 +24,10 @@ export class OmbiIntegration {
         OmbiIntegration.logger.error('OMBI_API_KEY environment variable is not set!');
       }
     } else {
-      // TODO Register job
-      new SyncOmbiMoviesJob(this.ombi, url, apiKey);
-      new SyncOmbiTvJob(this.ombi, url, apiKey);
+      this.jobs.add(
+        new SyncOmbiMoviesJob(this.ombi, url, apiKey),
+        new SyncOmbiTvJob(this.ombi, url, apiKey),
+      );
     }
   }
 }

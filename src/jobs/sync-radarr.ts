@@ -1,11 +1,11 @@
-import { Job } from '@/app/jobs';
+import { AbstractJob } from '@/app/jobs';
 import { RadarrMovie } from '@/types/radarr/api/RadarrMovie';
 import { createLogger } from '@/app/logger';
 import { attempt } from '@/utils/attempt';
 import axios, { AxiosInstance } from 'axios';
 import { RadarrIntegrationService } from '@/services/integrations/radarr';
 
-export class SyncRadarrJob implements Job {
+export class SyncRadarrJob extends AbstractJob {
   private static readonly logger = createLogger('Job "Sync Radarr"');
   private api: AxiosInstance;
 
@@ -14,6 +14,13 @@ export class SyncRadarrJob implements Job {
     radarrUrl: string,
     radarrApiKey: string,
   ) {
+    super({
+      id: 'sync-radarr',
+      name: 'Sync movies from Radarr',
+      duration: { minutes: 1 },
+      runImmediately: true,
+    });
+
     this.api = axios.create({
       baseURL: radarrUrl,
       headers: {

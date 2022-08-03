@@ -1,4 +1,3 @@
-import { Type } from 'class-transformer';
 import { JellyfinConfig } from '@/app/config/jellyfin';
 import { OmbiConfig } from '@/app/config/ombi';
 import { WebhooksConfig } from '@/app/config/webhooks';
@@ -13,48 +12,37 @@ import { HttpConfig } from './http';
 import { AbstractConfiguration } from '@/utils/config';
 
 export class Config extends AbstractConfiguration {
-  @Config.Child()
-  @Type(() => BazarrConfig)
+  @Config.Child(() => BazarrConfig)
   bazarr = new BazarrConfig();
 
-  @Config.Child()
-  @Type(() => DiscordConfig)
+  @Config.Child(() => DiscordConfig)
   discord = new DiscordConfig();
 
-  @Config.Child()
-  @Type(() => HttpConfig)
+  @Config.Child(() => HttpConfig)
   http = new HttpConfig();
 
-  @Config.Child()
-  @Type(() => JellyfinConfig)
+  @Config.Child(() => JellyfinConfig)
   jellyfin = new JellyfinConfig();
 
-  @Config.Child()
-  @Type(() => LidarrConfig)
+  @Config.Child(() => LidarrConfig)
   lidarr = new LidarrConfig();
 
-  @Config.Child()
-  @Type(() => OmbiConfig)
+  @Config.Child(() => OmbiConfig)
   ombi = new OmbiConfig();
 
-  @Config.Child()
-  @Type(() => OverseerrConfig)
+  @Config.Child(() => OverseerrConfig)
   overseerr = new OverseerrConfig();
 
-  @Config.Child()
-  @Type(() => PlexConfig)
+  @Config.Child(() => PlexConfig)
   plex = new PlexConfig();
 
-  @Config.Child()
-  @Type(() => RadarrConfig)
+  @Config.Child(() => RadarrConfig)
   radarr = new RadarrConfig();
 
-  @Config.Child()
-  @Type(() => SonarrConfig)
+  @Config.Child(() => SonarrConfig)
   sonarr = new SonarrConfig();
 
-  @Config.Child()
-  @Type(() => WebhooksConfig)
+  @Config.Child(() => WebhooksConfig)
   webhooks = new WebhooksConfig();
 
   static loadConfig(file: string) {

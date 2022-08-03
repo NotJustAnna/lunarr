@@ -1,4 +1,4 @@
-import { Job } from '@/app/jobs';
+import { AbstractJob } from '@/app/jobs';
 import { createLogger } from '@/app/logger';
 import { attempt } from '@/utils/attempt';
 import axios, { AxiosInstance } from 'axios';
@@ -9,15 +9,24 @@ import { SonarrIntegrationService } from '@/services/integrations/sonarr';
 import { ShowSeason } from '@prisma/client';
 import { SonarrSeason } from '@/types/sonarr/api/SonarrSeason';
 
-export class SyncSonarrJob implements Job {
+export class SyncSonarrJob extends AbstractJob {
   private static readonly logger = createLogger('Job "Sync Sonarr"');
   private api: AxiosInstance;
+
+  private progress?: { done: number; total: number };
 
   constructor(
     private readonly sonarr: SonarrIntegrationService,
     sonarrUrl: string,
     sonarrApiKey: string,
   ) {
+    super({
+      id: 'sync-sonarr',
+      name: 'Sync series from Sonarr',
+      duration: { minutes: 1 },
+      runImmediately: true,
+    });
+
     this.api = axios.create({
       baseURL: sonarrUrl,
       headers: {
@@ -60,12 +69,20 @@ export class SyncSonarrJob implements Job {
         );
       }),
       500,
-      (done, total) => {
+      (done, total, shouldReport) => {
+        this.progress = { done, total };
         const progress = Math.floor((done / total) * 1000) / 10;
-
-        SyncSonarrJob.logger.info(`Synced episodes of ${done} of ${total} series. (${progress}% done)`);
+        if (shouldReport) {
+          SyncSonarrJob.logger.info(`Synced episodes of ${done} of ${total} series. (${progress}% done)`);
+        }
       },
     );
+    delete this.progress;
+    SyncSonarrJob.logger.info(`Successfully synced ${series.length} series.`);
     await this.sonarr.untrackShows(series);
+  }
+
+  toJSON() {
+    return { ...super.toJSON(), progress: this.progress };
   }
 }
