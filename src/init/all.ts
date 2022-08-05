@@ -9,7 +9,7 @@ export { DatabaseInitializer } from './database';
 export { HttpInitializer } from './http';
 
 export { BazarrIntegration } from './integrations/bazarr';
-// export { DiscordIntegration } from './integrations/discord';
+export * from './integrations/discord/all';
 export { JellyfinIntegration } from './integrations/jellyfin';
 export { LidarrIntegration } from './integrations/lidarr';
 export { OmbiIntegration } from './integrations/ombi';

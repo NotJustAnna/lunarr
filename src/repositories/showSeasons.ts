@@ -1,13 +1,20 @@
 import { Service } from 'typedi';
 import { Prisma, PrismaClient, Show, ShowSeason } from '@prisma/client';
 import { ChangeSetService } from '@/services/events/changeSet';
+import { createLogger } from '@/app/logger';
+import _ from 'lodash';
+import { ShowEpisodesRepository } from '@/repositories/showEpisodes';
 import ShowSeasonWhereInput = Prisma.ShowSeasonWhereInput;
+import TransactionClient = Prisma.TransactionClient;
 
 @Service()
 export class ShowSeasonsRepository {
+  private readonly logger = createLogger(ShowSeasonsRepository.name);
+
   constructor(
     private readonly client: PrismaClient,
     private readonly events: ChangeSetService,
+    private readonly episodes: ShowEpisodesRepository,
   ) {
   }
 
@@ -75,5 +82,51 @@ export class ShowSeasonsRepository {
         ),
       );
     }
+  }
+
+  async deleteUntracked() {
+    return this.client.showSeason.deleteMany({
+      where: {
+        sonarrState: null,
+        jellyfinState: null,
+      },
+    });
+  }
+
+  async getById(id: string) {
+    return this.client.showSeason.findUnique({ where: { id } });
+  }
+
+  async internal_showMerging(client: TransactionClient, showId: string, mergedShowIds: string[]) {
+    const seasonsFound = await client.showSeason.findMany({
+      where: { showId: { in: [showId, ...mergedShowIds] } },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    await Promise.allSettled(Object.values(_.groupBy(seasonsFound, 'number')).map(async seasons => {
+      if (seasons.length === 1) {
+        if (seasons[0].showId !== showId) {
+          await client.showSeason.update({
+            where: { id: seasons[0].id },
+            data: { showId },
+          });
+        }
+        return;
+      }
+      const merged = seasons.reduce((season, duplicate) => {
+        season.jellyfinId = duplicate.jellyfinId || season.jellyfinId;
+        season.jellyfinState = duplicate.jellyfinState || season.jellyfinState;
+        season.sonarrState = duplicate.sonarrState || season.sonarrState;
+        return season;
+      });
+      const { id, ...mergedChanges } = merged;
+      const mergedSeasons = seasons.slice(1).map(s => s.id);
+      await this.episodes.internal_seasonMerging(client, id, mergedSeasons);
+      await client.showSeason.deleteMany({ where: { id: { in: mergedSeasons } } });
+      await client.showSeason.update({
+        where: { id },
+        data: { ...mergedChanges, showId },
+      });
+    }));
   }
 }

@@ -99,4 +99,13 @@ export class MoviesRepository {
       );
     }
   }
+
+  async deleteUntracked() {
+    return this.client.movie.deleteMany({
+      where: {
+        radarrState: null,
+        jellyfinState: null,
+      },
+    });
+  }
 }

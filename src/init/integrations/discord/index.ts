@@ -2,35 +2,28 @@ import { Service } from 'typedi';
 import { createLogger } from '@/app/logger';
 import * as process from 'process';
 import { REST } from '@discordjs/rest';
-import { Routes } from 'discord-api-types/v9';
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { ExitCode } from '@/utils/exitCode';
-import * as console from 'console';
-import { Client } from 'discord.js';
-import { AuthService } from '@/services/auth';
+import { GatewayIntentBits, Routes } from 'discord-api-types/v9';
+import { Client, Interaction, SlashCommandBuilder } from 'discord.js';
+import { DiscordConfig } from '@/app/config/discord';
 
 @Service()
 export class DiscordIntegration {
-
   private static readonly logger = createLogger('DiscordIntegration');
-  private client: Client<true>;
 
-  constructor(private readonly authenticationService: AuthService) {
+  readonly client: Client;
+  readonly readyClient: Promise<Client<true>>;
 
-    const discordToken = process.env.DISCORD_TOKEN;
-    if (!discordToken) {
-      DiscordIntegration.logger.error('DISCORD_TOKEN environment variable is not set');
-      process.exit(ExitCode.CONFIGURATION_ERROR);
-      throw new Error('Assertion Error');
-    }
-
+  constructor(private readonly discordConfig: DiscordConfig) {
     this.client = new Client({
-      intents: ['Guilds'],
+      intents: [GatewayIntentBits.Guilds],
+    });
+    this.readyClient = new Promise((resolve, reject) => {
+      this.client.once('ready', resolve);
+      this.client.login(discordConfig.token).catch(reject);
     });
 
-    this.client.on('ready', () => {
-      DiscordIntegration.logger.info(`Successfully logged in as ${this.client.user.tag}!`);
-    });
+    this.client.once('ready', this.onReady.bind(this));
+    this.client.on('interactionCreate', this.onInteraction.bind(this));
 
     // this.client.on('interactionCreate', async (interaction) => {
     //   if (interaction.isCommand()) {
@@ -61,11 +54,19 @@ export class DiscordIntegration {
     //   }
     // });
 
-    this.client.login(discordToken).catch(console.error);
+  }
+
+  private async onReady(client: Client<true>) {
+    DiscordIntegration.logger.info(`Successfully logged in as ${client.user.tag}!`);
+  }
+
+  private async onInteraction(interaction: Interaction) {
+    if (!interaction.isChatInputCommand() || interaction.commandName != 'lunarr') return;
+
+    interaction.options.getSubcommand(true);
   }
 
   private async deployCommands() {
-
     const logger = createLogger('Task "Deploy Commands"');
 
     const token = process.env.DISCORD_TOKEN!;

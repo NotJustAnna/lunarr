@@ -1,5 +1,50 @@
 import { Movie, Show, ShowEpisode, ShowSeason } from '@prisma/client';
 
+export interface Events {
+  all: GenericEvent;
+
+  movieCreated: MovieCreatedEvent;
+  movieUpdated: MovieUpdatedEvent;
+  movieDeleted: MovieDeletedEvent;
+
+  showCreated: ShowCreatedEvent;
+  showUpdated: ShowUpdatedEvent;
+  showDeleted: ShowDeletedEvent;
+
+  showSeasonCreated: ShowSeasonCreatedEvent;
+  showSeasonUpdated: ShowSeasonUpdatedEvent;
+  showSeasonDeleted: ShowSeasonDeletedEvent;
+
+  showEpisodeCreated: ShowEpisodeCreatedEvent;
+  showEpisodeUpdated: ShowEpisodeUpdatedEvent;
+  showEpisodeDeleted: ShowEpisodeDeletedEvent;
+}
+
+export const EventTypes = {
+  all: 'all',
+
+  movieCreated: 'movieCreated',
+  movieUpdated: 'movieUpdated',
+  movieDeleted: 'movieDeleted',
+
+  showCreated: 'showCreated',
+  showUpdated: 'showUpdated',
+  showDeleted: 'showDeleted',
+
+  showSeasonCreated: 'showSeasonCreated',
+  showSeasonUpdated: 'showSeasonUpdated',
+  showSeasonDeleted: 'showSeasonDeleted',
+
+  showEpisodeCreated: 'showEpisodeCreated',
+  showEpisodeUpdated: 'showEpisodeUpdated',
+  showEpisodeDeleted: 'showEpisodeDeleted',
+};
+
+export interface GenericEvent<T extends Exclude<keyof Events, 'all'> = Exclude<keyof Events, 'all'>> {
+  event: T;
+  data: Events[T];
+}
+
 export interface MovieCreatedEvent {
   movie: Movie;
 }

@@ -9,71 +9,71 @@ export class ChangeSetService {
     private readonly eventService: EventService,
   ) {}
 
-  async fromMovieChanges(movie: Movie, changes: Partial<Movie>) {
+  fromMovieChanges(movie: Movie, changes: Partial<Movie>) {
     const diff = microDiff(movie, changes);
     if (!diff) {
       return;
     }
 
-    this.eventService.emit('movie.updated', {
+    this.eventService.emit('movieUpdated', {
       movie: diff.applied,
       oldValues: diff.old,
       newValues: diff.new,
     });
   }
 
-  async fromNewMovie(movie: Movie) {
-    this.eventService.emit('movie.created', { movie });
+  fromNewMovie(movie: Movie) {
+    this.eventService.emit('movieCreated', { movie });
   }
 
-  async fromShowChanges(show: Show, changes: Partial<Show>) {
+  fromShowChanges(show: Show, changes: Partial<Show>) {
     const diff = microDiff(show, changes);
     if (!diff) {
       return;
     }
 
-    this.eventService.emit('show.updated', {
+    this.eventService.emit('showUpdated', {
       show: diff.applied,
       oldValues: diff.old,
       newValues: diff.new,
     });
   }
 
-  async fromNewShow(newShow: Show) {
-    this.eventService.emit('show.created', { show: newShow });
+  fromNewShow(newShow: Show) {
+    this.eventService.emit('showCreated', { show: newShow });
   }
 
-  async fromShowSeasonChanges(showSeason: ShowSeason, changes: Partial<ShowSeason>) {
+  fromShowSeasonChanges(showSeason: ShowSeason, changes: Partial<ShowSeason>) {
     const diff = microDiff(showSeason, changes);
     if (!diff) {
       return;
     }
 
-    this.eventService.emit('show.season.updated', {
+    this.eventService.emit('showSeasonUpdated', {
       showSeason: diff.applied,
       oldValues: diff.old,
       newValues: diff.new,
     });
   }
 
-  async fromNewShowSeason(newShowSeason: ShowSeason) {
-    this.eventService.emit('show.season.created', { showSeason: newShowSeason });
+  fromNewShowSeason(newShowSeason: ShowSeason) {
+    this.eventService.emit('showSeasonCreated', { showSeason: newShowSeason });
   }
 
-  async fromShowEpisodeChanges(showEpisode: ShowEpisode, changes: Partial<ShowEpisode>) {
+  fromShowEpisodeChanges(showEpisode: ShowEpisode, changes: Partial<ShowEpisode>) {
     const diff = microDiff(showEpisode, changes);
     if (!diff) {
       return;
     }
 
-    this.eventService.emit('show.episode.updated', {
+    this.eventService.emit('showEpisodeUpdated', {
       showEpisode: diff.applied,
       oldValues: diff.old,
       newValues: diff.new,
     });
   }
 
-  async fromNewShowEpisode(newShowEpisode: ShowEpisode) {
-    this.eventService.emit('show.episode.created', { showEpisode: newShowEpisode });
+  fromNewShowEpisode(newShowEpisode: ShowEpisode) {
+    this.eventService.emit('showEpisodeCreated', { showEpisode: newShowEpisode });
   }
 }

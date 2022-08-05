@@ -1,15 +1,15 @@
 import { Service } from 'typedi';
-import { EventListenerService } from '@/utils/eventListenerService';
-import { EventService } from '@/services/events';
+import { ListenerService } from '@/services/events/listener';
+import { GenericEvent } from '@/services/events/interfaces';
 
 @Service()
-export class WebhooksIntegration extends EventListenerService {
-  constructor(eventService: EventService) {
-    super(eventService);
+export class WebhooksIntegration {
+  constructor(eventListener: ListenerService) {
+    eventListener.registerBuiltinListeners(this);
   }
 
-  @EventListenerService.Register('all')
-  async allEvents(event: string, data: object) {
+  @ListenerService.RegisterBuiltin('all')
+  async allEvents(event: GenericEvent) {
 
   }
 }
