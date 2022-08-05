@@ -1,7 +1,9 @@
 import { Service } from 'typedi';
 import { Prisma, PrismaClient, ShowEpisode, ShowSeason } from '@prisma/client';
 import { ChangeSetService } from '@/services/events/changeSet';
+import _ from 'lodash';
 import ShowEpisodeWhereInput = Prisma.ShowEpisodeWhereInput;
+import TransactionClient = Prisma.TransactionClient;
 
 @Service()
 export class ShowEpisodesRepository {
@@ -75,5 +77,49 @@ export class ShowEpisodesRepository {
         ),
       );
     }
+  }
+
+  async deleteUntracked() {
+    return this.client.showEpisode.deleteMany({
+      where: {
+        sonarrState: null,
+        jellyfinState: null,
+      },
+    });
+  }
+
+  async internal_seasonMerging(client: TransactionClient, seasonId: any, mergedSeasonIds: any[]) {
+    const episodesFound = await client.showEpisode.findMany({
+      where: { seasonId: { in: [seasonId, ...mergedSeasonIds] } },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    await Promise.allSettled(Object.values(_.groupBy(episodesFound, 'number')).map(async episodes => {
+      if (episodes.length === 1) {
+        if (episodes[0].seasonId !== seasonId) {
+          await client.showEpisode.update({
+            where: { id: episodes[0].id },
+            data: { seasonId },
+          });
+        }
+        return;
+      }
+      const merged = episodes.reduce((episode, duplicate) => {
+        episode.title = duplicate.title || episode.title;
+        episode.jellyfinId = duplicate.jellyfinId || episode.jellyfinId;
+        episode.sonarrId = duplicate.sonarrId || episode.sonarrId;
+        episode.jellyfinState = duplicate.jellyfinState || episode.jellyfinState;
+        episode.sonarrState = duplicate.sonarrState || episode.sonarrState;
+        episode.ombiRequestState = duplicate.ombiRequestState || episode.ombiRequestState;
+        return episode;
+      });
+      const { id, ...mergedChanges } = merged;
+      const mergedEpisodes = episodes.slice(1).map(s => s.id);
+      await client.showEpisode.deleteMany({ where: { id: { in: mergedEpisodes } } });
+      await client.showEpisode.update({
+        where: { id },
+        data: { ...mergedChanges, seasonId },
+      });
+    }));
   }
 }

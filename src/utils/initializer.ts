@@ -8,6 +8,10 @@ export interface BatchInitializeResult {
   errors: { error: any; initializer: any }[];
 }
 
+export function fromBarrelFile(barrel: BarrelFileImport): Constructable<any>[] {
+  return Object.values(barrel);
+}
+
 export async function batchInitialize(initializers: Constructable<any>[] | BarrelFileImport) {
   const result: BatchInitializeResult = { instances: [], errors: [] };
   const promises: Promise<any>[] = [];

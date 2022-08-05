@@ -46,7 +46,7 @@ export class OmbiIntegrationService {
       'ombiRequestId',
       allowedExternal.map(m => String(m.id)),
       'ombiRequestState',
-      OmbiRequestDataState.NONE,
+      null,
     );
   }
 

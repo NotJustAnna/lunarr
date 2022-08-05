@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
 //  output = "../src/generated/prisma-client"
 }
 
@@ -20,9 +21,9 @@ model Movie {
   tmdbId            String?               @unique() @map("movi_tmdb_id")
   imdbId            String?               @unique() @map("movi_imdb_id")
 
-  jellyfinState     JellyfinDataState     @default(NONE) @map("movi_jellyfin_state")
-  radarrState       RadarrDataState       @default(NONE) @map("movi_radarr_state")
-  ombiRequestState  OmbiRequestDataState  @default(NONE) @map("movi_ombi_request_state")
+  jellyfinState     JellyfinDataState?    @map("movi_jellyfin_state")
+  radarrState       RadarrDataState?      @map("movi_radarr_state")
+  ombiRequestState  OmbiRequestDataState? @map("movi_ombi_request_state")
 
   videoTracks       MovieVideoTrack[]
   audioTracks       MovieAudioTrack[]
@@ -76,37 +77,37 @@ model MovieSubtitleTrack {
 }
 
 model Show {
-  id              String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @map("show_id")
-  createdAt       DateTime          @default(now()) @db.Timestamp(6) @map("show_created_at")
+  id              String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @map("show_id")
+  createdAt       DateTime            @default(now()) @db.Timestamp(6) @map("show_created_at")
 
-  title           String?           @map("show_title")
+  title           String?             @map("show_title")
 
-  jellyfinId      String?           @unique() @map("show_jellyfin_id")
-  sonarrId        String?           @unique() @map("show_sonarr_id")
-  ombiRequestId   String?           @unique() @map("show_ombi_request_id")
-  tvdbId          String?           @unique() @map("show_tvdb_id")
-  tvRageId        String?           @unique() @map("show_tvrage_id")
-  tvMazeId        String?           @unique() @map("show_tvmaze_id")
-  imdbId          String?           @unique() @map("show_imdb_id")
+  jellyfinId      String?             @unique() @map("show_jellyfin_id")
+  sonarrId        String?             @unique() @map("show_sonarr_id")
+  ombiRequestId   String?             @unique() @map("show_ombi_request_id")
+  tvdbId          String?             @unique() @map("show_tvdb_id")
+  tvRageId        String?             @unique() @map("show_tvrage_id")
+  tvMazeId        String?             @unique() @map("show_tvmaze_id")
+  imdbId          String?             @unique() @map("show_imdb_id")
 
-  jellyfinState   JellyfinDataState @default(NONE) @map("show_jellyfin_state")
-  sonarrState     SonarrDataState   @default(NONE) @map("show_sonarr_state")
+  jellyfinState   JellyfinDataState?  @map("show_jellyfin_state")
+  sonarrState     SonarrDataState?    @map("show_sonarr_state")
 
   seasons         ShowSeason[]
 }
 
 model ShowSeason {
-  id              String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @map("shse_id")
-  number          Int               @map("shse_number")
-  createdAt       DateTime          @default(now()) @db.Timestamp(6) @map("shse_created_at")
+  id              String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @map("shse_id")
+  number          Int                 @map("shse_number")
+  createdAt       DateTime            @default(now()) @db.Timestamp(6) @map("shse_created_at")
 
-  jellyfinId      String?           @unique() @map("shse_jellyfin_id")
+  jellyfinId      String?             @unique() @map("shse_jellyfin_id")
 
-  jellyfinState   JellyfinDataState @default(NONE) @map("shse_jellyfin_state")
-  sonarrState     SonarrDataState   @default(NONE) @map("shse_sonarr_state")
+  jellyfinState   JellyfinDataState?  @map("shse_jellyfin_state")
+  sonarrState     SonarrDataState?    @map("shse_sonarr_state")
 
-  showId          String            @db.Uuid @map("show_id")
-  show            Show              @relation(fields: [showId], references: [id], onDelete: Cascade)
+  showId          String              @db.Uuid @map("show_id")
+  show            Show                @relation(fields: [showId], references: [id], onDelete: Cascade)
   episodes        ShowEpisode[]
 
   @@unique([showId, number])
@@ -122,9 +123,9 @@ model ShowEpisode {
   jellyfinId            String?                 @unique() @map("shep_jellyfin_id")
   sonarrId              String?                 @unique() @map("shep_sonarr_id")
 
-  jellyfinState         JellyfinDataState       @default(NONE) @map("shep_jellyfin_state")
-  sonarrState           SonarrEpisodeDataState  @default(NONE) @map("shep_sonarr_state")
-  ombiRequestState      OmbiRequestDataState    @default(NONE) @map("shep_ombi_request_state")
+  jellyfinState         JellyfinDataState?      @map("shep_jellyfin_state")
+  sonarrState           SonarrEpisodeDataState? @map("shep_sonarr_state")
+  ombiRequestState      OmbiRequestDataState?   @map("shep_ombi_request_state")
 
   seasonId              String                  @db.Uuid @map("shse_id")
   season                ShowSeason              @relation(fields: [seasonId], references: [id], onDelete: Cascade)
@@ -136,17 +137,17 @@ model ShowEpisode {
 }
 
 model EpisodeAudioTrack {
-  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @map("epat_id")
-  createdAt   DateTime  @default(now()) @db.Timestamp(6) @map("epat_created_at")
+  id          String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @map("epat_id")
+  createdAt   DateTime      @default(now()) @db.Timestamp(6) @map("epat_created_at")
 
-  title       String    @map("epat_title")
-  codec       String    @map("epat_codec")
-  language    String    @map("epat_language")
-  channels    String    @map("epat_channels")
-  bitrate     String    @map("epat_bitrate")
-  sampleRate  String    @map("epat_sample_rate")
+  title       String        @map("epat_title")
+  codec       String        @map("epat_codec")
+  language    String        @map("epat_language")
+  channels    String        @map("epat_channels")
+  bitrate     String        @map("epat_bitrate")
+  sampleRate  String        @map("epat_sample_rate")
 
-  episodeId   String    @db.Uuid @map("shep_id")
+  episodeId   String        @db.Uuid @map("shep_id")
   episode     ShowEpisode   @relation(fields: [episodeId], references: [id], onDelete: Cascade)
 }
 
@@ -182,13 +183,11 @@ model EpisodeSubtitleTrack {
 }
 
 enum JellyfinDataState {
-  NONE
   UNAVAILABLE
   AVAILABLE
 }
 
 enum RadarrDataState {
-  NONE
   UNMONITORED
   MONITORED
   GRABBED
@@ -197,13 +196,11 @@ enum RadarrDataState {
 }
 
 enum SonarrDataState {
-  NONE
   UNMONITORED
   MONITORED
 }
 
 enum SonarrEpisodeDataState {
-  NONE
   UNMONITORED
   MONITORED
   GRABBED
@@ -212,7 +209,6 @@ enum SonarrEpisodeDataState {
 }
 
 enum OmbiRequestDataState {
-  NONE
   PENDING_APPROVAL
   REQUEST_DENIED
   PROCESSING_REQUEST

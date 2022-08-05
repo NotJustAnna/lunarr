@@ -1,90 +1,43 @@
 import { EventEmitter } from 'events';
-import {
-  MovieCreatedEvent,
-  MovieUpdatedEvent,
-  ShowCreatedEvent,
-  ShowDeletedEvent,
-  ShowEpisodeCreatedEvent,
-  ShowEpisodeDeletedEvent,
-  ShowEpisodeUpdatedEvent,
-  ShowSeasonCreatedEvent,
-  ShowSeasonDeletedEvent,
-  ShowSeasonUpdatedEvent,
-  ShowUpdatedEvent,
-} from '@/services/events/interfaces';
+import { Events, GenericEvent } from '@/services/events/interfaces';
 import { Service } from 'typedi';
+import { Awaitable } from '@/utils/types';
+import { createLogger } from '@/app/logger';
 
 @Service()
 export class EventService {
+  private static readonly logger = createLogger(EventService.name);
+
   private readonly eventEmitter = new EventEmitter();
 
   constructor() {}
 
-  on(event: 'movie.created', listener: (data: MovieCreatedEvent) => void): void;
-  on(event: 'movie.updated', listener: (data: MovieUpdatedEvent) => void): void;
-  on(event: 'show.created', listener: (data: ShowCreatedEvent) => void): void;
-  on(event: 'show.updated', listener: (data: ShowUpdatedEvent) => void): void;
-  on(event: 'show.deleted', listener: (data: ShowDeletedEvent) => void): void;
-  on(event: 'show.season.created', listener: (data: ShowSeasonCreatedEvent) => void): void;
-  on(event: 'show.season.updated', listener: (data: ShowSeasonUpdatedEvent) => void): void;
-  on(event: 'show.season.deleted', listener: (data: ShowSeasonDeletedEvent) => void): void;
-  on(event: 'show.episode.created', listener: (data: ShowEpisodeCreatedEvent) => void): void;
-  on(event: 'show.episode.updated', listener: (data: ShowEpisodeUpdatedEvent) => void): void;
-  on(event: 'show.episode.deleted', listener: (data: ShowEpisodeDeletedEvent) => void): void;
-  on(event: 'all', listener: (event: string, data: any) => void): void;
-  on(event: string, listener: (data: any) => void): void;
-  on(event: string, listener: (...args: any[]) => void): void {
+  on<K extends keyof Events>(event: K, listener: (data: Events[K]) => Awaitable): this;
+  on<S extends string | symbol>(event: Exclude<S, keyof Events>, listener: (data: any) => Awaitable): this;
+  on(event: string, listener: (data: any) => Awaitable): this {
     this.eventEmitter.on(event, listener);
+    return this;
   }
 
-  off(event: 'movie.created', listener: (data: MovieCreatedEvent) => void): void;
-  off(event: 'movie.updated', listener: (data: MovieUpdatedEvent) => void): void;
-  off(event: 'show.created', listener: (data: ShowCreatedEvent) => void): void;
-  off(event: 'show.updated', listener: (data: ShowUpdatedEvent) => void): void;
-  off(event: 'show.deleted', listener: (data: ShowDeletedEvent) => void): void;
-  off(event: 'show.season.created', listener: (data: ShowSeasonCreatedEvent) => void): void;
-  off(event: 'show.season.updated', listener: (data: ShowSeasonUpdatedEvent) => void): void;
-  off(event: 'show.season.deleted', listener: (data: ShowSeasonDeletedEvent) => void): void;
-  off(event: 'show.episode.created', listener: (data: ShowEpisodeCreatedEvent) => void): void;
-  off(event: 'show.episode.updated', listener: (data: ShowEpisodeUpdatedEvent) => void): void;
-  off(event: 'show.episode.deleted', listener: (data: ShowEpisodeDeletedEvent) => void): void;
-  off(event: 'all', listener: (event: string, data: any) => void): void;
-  off(event: string, listener: (data: any) => void): void;
-  off(event: string, listener: (...args: any[]) => void) {
+  off<K extends keyof Events>(event: K, listener: (data: Events[K]) => Awaitable): this;
+  off<S extends string | symbol>(event: Exclude<S, keyof Events>, listener: (data: any) => Awaitable): this;
+  off(event: string, listener: (data: any) => Awaitable): this {
     this.eventEmitter.off(event, listener);
+    return this;
   }
 
-  once(event: 'movie.created', listener: (data: MovieCreatedEvent) => void): void;
-  once(event: 'movie.updated', listener: (data: MovieUpdatedEvent) => void): void;
-  once(event: 'show.created', listener: (data: ShowCreatedEvent) => void): void;
-  once(event: 'show.updated', listener: (data: ShowUpdatedEvent) => void): void;
-  once(event: 'show.deleted', listener: (data: ShowDeletedEvent) => void): void;
-  once(event: 'show.season.created', listener: (data: ShowSeasonCreatedEvent) => void): void;
-  once(event: 'show.season.updated', listener: (data: ShowSeasonUpdatedEvent) => void): void;
-  once(event: 'show.season.deleted', listener: (data: ShowSeasonDeletedEvent) => void): void;
-  once(event: 'show.episode.created', listener: (data: ShowEpisodeCreatedEvent) => void): void;
-  once(event: 'show.episode.updated', listener: (data: ShowEpisodeUpdatedEvent) => void): void;
-  once(event: 'show.episode.deleted', listener: (data: ShowEpisodeDeletedEvent) => void): void;
-  once(event: 'all', listener: (event: string, data: any) => void): void;
-  once(event: string, listener: (data: any) => void): void;
-  once(event: string, listener: (...args: any[]) => void) {
+  once<K extends keyof Events>(event: K, listener: (data: Events[K]) => Awaitable): this;
+  once<S extends string | symbol>(event: Exclude<S, keyof Events>, listener: (data: any) => Awaitable): this;
+  once(event: string, listener: (data: any) => Awaitable): this {
     this.eventEmitter.once(event, listener);
+    return this;
   }
 
-  emit(event: 'movie.created', data: MovieCreatedEvent): void;
-  emit(event: 'movie.updated', data: MovieUpdatedEvent): void;
-  emit(event: 'show.created', data: ShowCreatedEvent): void;
-  emit(event: 'show.updated', data: ShowUpdatedEvent): void;
-  emit(event: 'show.deleted', data: ShowDeletedEvent): void;
-  emit(event: 'show.season.created', data: ShowSeasonCreatedEvent): void;
-  emit(event: 'show.season.updated', data: ShowSeasonUpdatedEvent): void;
-  emit(event: 'show.season.deleted', data: ShowSeasonDeletedEvent): void;
-  emit(event: 'show.episode.created', data: ShowEpisodeCreatedEvent): void;
-  emit(event: 'show.episode.updated', data: ShowEpisodeUpdatedEvent): void;
-  emit(event: 'show.episode.deleted', data: ShowEpisodeDeletedEvent): void;
-  emit(event: string, data: any): void;
-  emit(event: string, data: any) {
+  emit<K extends Exclude<keyof Events, 'all'>>(event: K, data: Events[K]): this;
+  emit<S extends string | symbol>(event: Exclude<S, keyof Events>, data: any): this;
+  emit(event: string, data: any): this {
     this.eventEmitter.emit(event, data);
-    this.eventEmitter.emit('all', event, data);
+    this.eventEmitter.emit('all', { event, data } as GenericEvent);
+    return this;
   }
 }

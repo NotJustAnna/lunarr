@@ -53,28 +53,28 @@ export class SonarrIntegrationService {
       'sonarrId',
       allowedExternal.map(s => String(s.id)),
       'sonarrState',
-      SonarrDataState.NONE,
+      null,
     );
     await this.showSeasons.inheritUntrack(
-      'sonarrState', SonarrDataState.NONE, 'sonarrState', SonarrDataState.NONE,
+      'sonarrState', null, 'sonarrState', null,
     );
     await this.showEpisodes.inheritUntrack(
-      'sonarrState', SonarrDataState.NONE, 'sonarrState', SonarrEpisodeDataState.NONE,
+      'sonarrState', null, 'sonarrState', null,
     );
   }
 
   async untrackSeasons(showId: Show['id'], allowedExternal: SonarrSeason[]) {
     await this.showSeasons.foreignUntrack(
-      showId, allowedExternal.map(s => s.seasonNumber), 'sonarrState', SonarrDataState.NONE,
+      showId, allowedExternal.map(s => s.seasonNumber), 'sonarrState', null,
     );
     await this.showEpisodes.inheritUntrack(
-      'sonarrState', SonarrDataState.NONE, 'sonarrState', SonarrEpisodeDataState.NONE,
+      'sonarrState', null, 'sonarrState', null,
     );
   }
 
   async untrackEpisodes(seasonId: ShowSeason['id'], allowedExternal: SonarrEpisode[]) {
     await this.showEpisodes.foreignUntrack(
-      seasonId, allowedExternal.map(e => e.episodeNumber), 'sonarrState', SonarrEpisodeDataState.NONE,
+      seasonId, allowedExternal.map(e => e.episodeNumber), 'sonarrState', null,
     );
   }
 

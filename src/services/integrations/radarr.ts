@@ -26,7 +26,7 @@ export class RadarrIntegrationService {
       'radarrId',
       allowedExternal.map(m => String(m.id)),
       'radarrState',
-      RadarrDataState.NONE,
+      null,
     );
   }
 }
