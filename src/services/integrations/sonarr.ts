@@ -21,7 +21,7 @@ export class SonarrIntegrationService {
       tvdbId: (external.tvdbId && external.tvdbId !== 0) ? String(external.tvdbId) : null,
       tvMazeId: (external.tvMazeId && external.tvMazeId !== 0) ? String(external.tvMazeId) : null,
       tvRageId: (external.tvRageId && external.tvRageId !== 0) ? String(external.tvRageId) : null,
-      title: external.title,
+      sonarrTitle: external.title,
       sonarrState: external.monitored ? SonarrDataState.MONITORED : SonarrDataState.UNMONITORED,
     };
 
@@ -38,7 +38,7 @@ export class SonarrIntegrationService {
 
   async syncEpisode(seasonId: ShowSeason['id'], external: SonarrEpisode) {
     const changes: Partial<ShowEpisode> = {
-      title: external.title,
+      sonarrTitle: external.title,
       sonarrId: String(external.id),
       sonarrState: external.monitored ?
         (external.hasFile ? SonarrEpisodeDataState.AVAILABLE : SonarrEpisodeDataState.MONITORED)

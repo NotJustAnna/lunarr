@@ -63,7 +63,9 @@ export class ShowsRepository {
         const start = performance.now();
         // NOTE: Might be worth debugging why shows got duplicated.
         const merged = shows.reduce((show, duplicate) => {
-          show.title = duplicate.title || show.title;
+          show.sonarrTitle = duplicate.sonarrTitle || show.sonarrTitle;
+          show.jellyfinTitle = duplicate.jellyfinTitle || show.jellyfinTitle;
+          show.ombiRequestTitle = duplicate.ombiRequestTitle || show.ombiRequestTitle;
           show.jellyfinId = duplicate.jellyfinId || show.jellyfinId;
           show.sonarrId = duplicate.sonarrId || show.sonarrId;
           show.ombiRequestId = duplicate.ombiRequestId || show.ombiRequestId;

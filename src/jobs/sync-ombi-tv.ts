@@ -35,6 +35,6 @@ export class SyncOmbiTvJob extends AbstractJob {
     for (const request of requests) {
       await this.ombi.syncShow(request);
     }
-    await this.ombi.untrackShows(requests);
+    // await this.ombi.untrackShows(requests);
   }
 }
