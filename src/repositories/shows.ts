@@ -64,6 +64,11 @@ export class ShowsRepository {
         // NOTE: Might be worth debugging why shows got duplicated.
         const merged = shows.reduce((show, duplicate) => {
           show.sonarrTitle = duplicate.sonarrTitle || show.sonarrTitle;
+          show.sonarrPosterImage = duplicate.sonarrPosterImage || show.sonarrPosterImage;
+          show.sonarrBannerImage = duplicate.sonarrBannerImage || show.sonarrBannerImage;
+          show.sonarrFanartImage = duplicate.sonarrFanartImage || show.sonarrFanartImage;
+          show.sonarrScreenshotImage = duplicate.sonarrScreenshotImage || show.sonarrScreenshotImage;
+          show.sonarrHeadshotImage = duplicate.sonarrHeadshotImage || show.sonarrHeadshotImage;
           show.jellyfinTitle = duplicate.jellyfinTitle || show.jellyfinTitle;
           show.ombiRequestTitle = duplicate.ombiRequestTitle || show.ombiRequestTitle;
           show.jellyfinId = duplicate.jellyfinId || show.jellyfinId;

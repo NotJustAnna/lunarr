@@ -15,6 +15,14 @@ export class SonarrIntegrationService {
     private readonly showEpisodes: ShowEpisodesRepository,
   ) {}
 
+  private static readonly whenSonarrImageCoverType: Record<string, keyof Show> = {
+    'poster': 'sonarrPosterImage',
+    'banner': 'sonarrBannerImage',
+    'fanart': 'sonarrFanartImage',
+    'screenshot': 'sonarrScreenshotImage',
+    'headshot': 'sonarrHeadshotImage',
+  };
+
   async syncShow(external: SonarrSeries) {
     const changes: Partial<Show> = {
       sonarrId: String(external.id),
@@ -24,6 +32,13 @@ export class SonarrIntegrationService {
       sonarrTitle: external.title,
       sonarrState: external.monitored ? SonarrDataState.MONITORED : SonarrDataState.UNMONITORED,
     };
+
+    for (let image of external.images) {
+      const key = SonarrIntegrationService.whenSonarrImageCoverType[image.coverType];
+      if (key) {
+        changes[key] = image.remoteUrl as any;
+      }
+    }
 
     return this.shows.sync(changes);
   }
