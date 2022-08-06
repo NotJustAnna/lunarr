@@ -62,13 +62,14 @@ export class SyncSonarrJob extends AbstractJob {
           return acc;
         }, {} as Record<number, SonarrSeason>);
 
-        await this.sonarr.untrackSeasonsAndEpisodes(
-          show.id,
-          seasons.map(s => ({ id: s.id, external: sonarrSeasonByNumber[s.number] })),
-          r.data,
-        );
+        // TODO
+        // await this.sonarr.untrackSeasonsAndEpisodes(
+        //   show.id,
+        //   seasons.map(s => ({ id: s.id, external: sonarrSeasonByNumber[s.number] })),
+        //   r.data,
+        // );
       }),
-      500,
+      1500,
       (done, total, shouldReport) => {
         this.progress = { done, total };
         const progress = Math.floor((done / total) * 1000) / 10;
@@ -79,7 +80,7 @@ export class SyncSonarrJob extends AbstractJob {
     );
     delete this.progress;
     SyncSonarrJob.logger.info(`Successfully synced ${series.length} series.`);
-    await this.sonarr.untrackShows(series);
+    // await this.sonarr.untrackShows(series);
   }
 
   toJSON() {

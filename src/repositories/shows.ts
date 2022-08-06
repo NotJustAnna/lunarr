@@ -44,6 +44,7 @@ export class ShowsRepository {
     return this.client.show.findMany();
   }
 
+  // @AsyncTimeTracker('ShowsRepository.sync')
   async sync(changes: Partial<Show>) {
     return this.client.$transaction(async (client) => {
       const shows = await client.show.findMany({

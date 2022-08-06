@@ -56,7 +56,7 @@ export abstract class AbstractJob {
       const result = this.run();
       if (result instanceof Promise) {
         result
-          .catch((error) => AbstractJob.log.error(`Job ${this.name} failed with an error`, { error }))
+          .catch((error) => AbstractJob.log.error(`Job \"${this.name}\" failed with an error`, { error }))
           .then(() => {
             this.executing = false;
             this.reschedule();
@@ -66,7 +66,7 @@ export abstract class AbstractJob {
         this.reschedule();
       }
     } catch (error) {
-      AbstractJob.log.error(`Job ${this.name} failed with an error`, { error });
+      AbstractJob.log.error(`Job \"${this.name}\" failed with an error`, { error });
       this.executing = false;
       this.reschedule();
     }

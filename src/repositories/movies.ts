@@ -2,6 +2,7 @@ import { Service } from 'typedi';
 import { createLogger } from '@/app/logger';
 import { Movie, Prisma, PrismaClient } from '@prisma/client';
 import { ChangeSetService } from '@/services/events/changeSet';
+import { performance } from 'perf_hooks';
 import MovieWhereInput = Prisma.MovieWhereInput;
 
 @Service()
@@ -35,69 +36,70 @@ export class MoviesRepository {
   }
 
   async sync(changes: Partial<Movie>) {
-    const movie = await this.findUniqueOrMerge(MoviesRepository.fromChanges(changes));
-    if (movie) {
-      const updatedMovie = await this.client.movie.update({ data: changes, where: { id: movie.id } });
-      await this.events.fromMovieChanges(movie, changes);
-      return updatedMovie;
-    } else {
-      const newMovie = await this.client.movie.create({ data: changes });
-      await this.events.fromNewMovie(newMovie);
-      return newMovie;
-    }
-  }
-
-  private async findUniqueOrMerge(where: MovieWhereInput) {
-    const movies: Movie[] = await this.client.movie.findMany({ where, orderBy: { createdAt: 'asc' } });
-    if (movies.length === 0) {
-      return null;
-    }
-    if (movies.length === 1) {
-      return movies[0];
-    }
-    // NOTE: Might be worth debugging why movies got duplicated.
-    const data = movies.reduce((movie, duplicate) => {
-      movie.title = duplicate.title || movie.title;
-      movie.jellyfinId = duplicate.jellyfinId || movie.jellyfinId;
-      movie.radarrId = duplicate.radarrId || movie.radarrId;
-      movie.ombiRequestId = duplicate.ombiRequestId || movie.ombiRequestId;
-      movie.tmdbId = duplicate.tmdbId || movie.tmdbId;
-      movie.imdbId = duplicate.imdbId || movie.imdbId;
-      movie.jellyfinState = duplicate.jellyfinState || movie.jellyfinState;
-      movie.radarrState = duplicate.radarrState || movie.radarrState;
-      movie.ombiRequestState = duplicate.ombiRequestState || movie.ombiRequestState;
-      return movie;
+    return this.client.$transaction(async (client) => {
+      const movies = await client.movie.findMany({
+        where: MoviesRepository.fromChanges(changes),
+        orderBy: { createdAt: 'asc' },
+      });
+      if (movies.length === 0) {
+        const newMovie = await client.movie.create({ data: changes });
+        this.events.fromNewMovie(newMovie);
+        return newMovie;
+      } else if (movies.length === 1) {
+        const updatedMovie = await client.movie.update({ data: changes, where: { id: movies[0].id } });
+        this.events.fromMovieChanges(movies[0], changes);
+        return updatedMovie;
+      } else {
+        MoviesRepository.logger.debug('Found multiple movies matching a single sync(), merging...');
+        const start = performance.now();
+        // NOTE: Might be worth debugging why movies got duplicated.
+        const merged = movies.reduce((movie, duplicate) => {
+          movie.title = duplicate.title || movie.title;
+          movie.jellyfinId = duplicate.jellyfinId || movie.jellyfinId;
+          movie.radarrId = duplicate.radarrId || movie.radarrId;
+          movie.ombiRequestId = duplicate.ombiRequestId || movie.ombiRequestId;
+          movie.tmdbId = duplicate.tmdbId || movie.tmdbId;
+          movie.imdbId = duplicate.imdbId || movie.imdbId;
+          movie.jellyfinState = duplicate.jellyfinState || movie.jellyfinState;
+          movie.radarrState = duplicate.radarrState || movie.radarrState;
+          movie.ombiRequestState = duplicate.ombiRequestState || movie.ombiRequestState;
+          return movie;
+        });
+        const { id, ...mergedChanges } = merged;
+        const mergedMovies = movies.slice(1).map(m => m.id);
+        await client.movie.deleteMany({ where: { id: { in: mergedMovies } } });
+        const updatedMovie = await client.movie.update({ data: { ...mergedChanges, ...changes }, where: { id } });
+        this.events.fromMovieChanges(merged, changes);
+        MoviesRepository.logger.debug(`Merged ${movies.length} movies in ${performance.now() - start}ms`);
+        return updatedMovie;
+      }
     });
-
-    await this.client.$transaction([
-      this.client.movie.update({ data, where: { id: data.id } }),
-      this.client.movie.deleteMany({ where: { id: { not: data.id, in: movies.slice(1).map(m => m.id) } } }),
-    ]);
-    return data;
   }
 
   async foreignUntrack<Key extends keyof Movie, State extends keyof Movie>(
     foreignKey: Key, allowedKeys: MovieWhereInput[Key][],
     stateKey: State, allowedState: MovieWhereInput[State],
   ) {
-    const movies = await this.client.movie.findMany({
-      where: {
-        [foreignKey]: { not: null, notIn: allowedKeys },
-        [stateKey]: { not: allowedState },
-      },
-    });
-
-    if (movies.length > 0) {
-      await this.client.movie.updateMany({
-        data: { [foreignKey]: null, [stateKey]: allowedState },
-        where: { id: { in: movies.map(m => m.id) } },
+    await this.client.$transaction<void>(async (client) => {
+      const movies = await client.movie.findMany({
+        where: {
+          [foreignKey]: { not: null, notIn: allowedKeys },
+          [stateKey]: { not: allowedState },
+        },
       });
-      await Promise.all(
-        movies.map(
-          m => this.events.fromMovieChanges(m, { [foreignKey]: null, [stateKey]: allowedState }),
-        ),
-      );
-    }
+
+      if (movies.length > 0) {
+        await client.movie.updateMany({
+          data: { [foreignKey]: null, [stateKey]: allowedState },
+          where: { id: { in: movies.map(m => m.id) } },
+        });
+        await Promise.all(
+          movies.map(
+            m => this.events.fromMovieChanges(m, { [foreignKey]: null, [stateKey]: allowedState }),
+          ),
+        );
+      }
+    });
   }
 
   async deleteUntracked() {
