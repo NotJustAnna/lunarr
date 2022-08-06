@@ -4,6 +4,7 @@ import { Movie, Prisma, PrismaClient } from '@prisma/client';
 import { ChangeSetService } from '@/services/events/changeSet';
 import { performance } from 'perf_hooks';
 import MovieWhereInput = Prisma.MovieWhereInput;
+import { merge } from '@/utils/merge';
 
 @Service()
 export class MoviesRepository {
@@ -53,21 +54,7 @@ export class MoviesRepository {
         MoviesRepository.logger.debug('Found multiple movies matching a single sync(), merging...');
         const start = performance.now();
         // NOTE: Might be worth debugging why movies got duplicated.
-        const merged = movies.reduce((movie, duplicate) => {
-          // movie.title = duplicate.title || movie.title;
-          movie.jellyfinTitle = duplicate.jellyfinTitle || movie.jellyfinTitle;
-          movie.radarrTitle = duplicate.radarrTitle || movie.radarrTitle;
-          movie.ombiTitle = duplicate.ombiTitle || movie.ombiTitle;
-          movie.jellyfinId = duplicate.jellyfinId || movie.jellyfinId;
-          movie.radarrId = duplicate.radarrId || movie.radarrId;
-          movie.ombiId = duplicate.ombiId || movie.ombiId;
-          movie.tmdbId = duplicate.tmdbId || movie.tmdbId;
-          movie.imdbId = duplicate.imdbId || movie.imdbId;
-          movie.jellyfinState = duplicate.jellyfinState || movie.jellyfinState;
-          movie.radarrState = duplicate.radarrState || movie.radarrState;
-          movie.ombiState = duplicate.ombiState || movie.ombiState;
-          return movie;
-        });
+        const merged = merge(movies, ['id', 'createdAt']);
         const { id, ...mergedChanges } = merged;
         const mergedMovies = movies.slice(1).map(m => m.id);
         await client.movie.deleteMany({ where: { id: { in: mergedMovies } } });

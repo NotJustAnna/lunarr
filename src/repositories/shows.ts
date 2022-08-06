@@ -5,6 +5,7 @@ import { ChangeSetService } from '@/services/events/changeSet';
 import { ShowSeasonsRepository } from '@/repositories/showSeasons';
 import { performance } from 'perf_hooks';
 import ShowWhereInput = Prisma.ShowWhereInput;
+import { merge } from '@/utils/merge';
 
 @Service()
 export class ShowsRepository {
@@ -62,25 +63,7 @@ export class ShowsRepository {
         ShowsRepository.logger.debug('Found multiple shows matching a single sync(), merging...');
         const start = performance.now();
         // NOTE: Might be worth debugging why shows got duplicated.
-        const merged = shows.reduce((show, duplicate) => {
-          show.sonarrTitle = duplicate.sonarrTitle || show.sonarrTitle;
-          show.sonarrPosterImage = duplicate.sonarrPosterImage || show.sonarrPosterImage;
-          show.sonarrBannerImage = duplicate.sonarrBannerImage || show.sonarrBannerImage;
-          show.sonarrFanartImage = duplicate.sonarrFanartImage || show.sonarrFanartImage;
-          show.sonarrScreenshotImage = duplicate.sonarrScreenshotImage || show.sonarrScreenshotImage;
-          show.sonarrHeadshotImage = duplicate.sonarrHeadshotImage || show.sonarrHeadshotImage;
-          show.jellyfinTitle = duplicate.jellyfinTitle || show.jellyfinTitle;
-          show.ombiTitle = duplicate.ombiTitle || show.ombiTitle;
-          show.jellyfinId = duplicate.jellyfinId || show.jellyfinId;
-          show.sonarrId = duplicate.sonarrId || show.sonarrId;
-          show.ombiId = duplicate.ombiId || show.ombiId;
-          show.tvdbId = duplicate.tvdbId || show.tvdbId;
-          show.tvRageId = duplicate.tvRageId || show.tvRageId;
-          show.tvMazeId = duplicate.tvMazeId || show.tvMazeId;
-          show.jellyfinState = duplicate.jellyfinState || show.jellyfinState;
-          show.sonarrState = duplicate.sonarrState || show.sonarrState;
-          return show;
-        });
+        const merged = merge(shows, ['id', 'createdAt']);
         const { id, ...mergedChanges } = merged;
         const mergedShows = shows.slice(1).map(m => m.id);
         await this.seasons.internal_showMerging(client, id, mergedShows);

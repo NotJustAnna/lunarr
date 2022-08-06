@@ -6,6 +6,7 @@ import _ from 'lodash';
 import { ShowEpisodesRepository } from '@/repositories/showEpisodes';
 import ShowSeasonWhereInput = Prisma.ShowSeasonWhereInput;
 import TransactionClient = Prisma.TransactionClient;
+import { merge } from '@/utils/merge';
 
 @Service()
 export class ShowSeasonsRepository {
@@ -115,12 +116,7 @@ export class ShowSeasonsRepository {
         }
         return;
       }
-      const merged = seasons.reduce((season, duplicate) => {
-        season.jellyfinId = duplicate.jellyfinId || season.jellyfinId;
-        season.jellyfinState = duplicate.jellyfinState || season.jellyfinState;
-        season.sonarrState = duplicate.sonarrState || season.sonarrState;
-        return season;
-      });
+      const merged = merge(seasons, ['id', 'showId', 'number', 'createdAt']);
       const { id, ...mergedChanges } = merged;
       const mergedSeasons = seasons.slice(1).map(s => s.id);
       await this.episodes.internal_seasonMerging(client, id, mergedSeasons);

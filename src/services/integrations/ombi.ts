@@ -17,6 +17,7 @@ export class OmbiIntegrationService {
   async syncMovie(external: MovieRequest) {
     const changes: Partial<Movie> = {
       ombiTitle: external.title,
+      ombiOverview: external.overview,
       ombiId: String(external.id),
       tmdbId: (external.theMovieDbId && external.theMovieDbId !== 0) ? String(external.theMovieDbId) : null,
       imdbId: (external.imdbId && external.imdbId !== '0') ? external.imdbId : null,
@@ -34,6 +35,7 @@ export class OmbiIntegrationService {
   async syncShow(external: TvRequest) {
     const changes: Partial<Show> = {
       ombiTitle: external.title,
+      ombiOverview: external.overview,
       ombiId: String(external.id),
       tvdbId: (external.tvDbId && external.tvDbId !== 0) ? String(external.tvDbId) : null,
       imdbId: (external.imdbId && external.imdbId !== '0') ? external.imdbId : null,
