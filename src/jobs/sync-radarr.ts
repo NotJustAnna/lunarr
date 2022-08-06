@@ -34,7 +34,7 @@ export class SyncRadarrJob extends AbstractJob {
     const response = await attempt(3, () => this.api.get<RadarrMovie[]>(`/api/v3/movie`));
     const movies = response.data;
     SyncRadarrJob.logger.info(`Radarr sync complete! Found ${movies.length} movies.`);
-
+    require('fs-extra').writeJson('scratches/sync-radarr.json', movies, { spaces: 2 });
     for (const movie of movies) {
       await this.radarr.syncMovie(movie);
     }

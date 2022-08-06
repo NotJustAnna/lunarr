@@ -10,26 +10,32 @@ datasource db {
 }
 
 model Movie {
-  id                String                @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @map("movi_id")
-  createdAt         DateTime              @default(now()) @db.Timestamp(6) @map("movi_created_at")
+  id                    String                @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @map("movi_id")
+  createdAt             DateTime              @default(now()) @db.Timestamp(6) @map("movi_created_at")
 
-  jellyfinTitle     String?               @map("movi_jellyfin_title")
-  radarrTitle       String?               @map("movi_radarr_title")
-  ombiRequestTitle  String?               @map("movi_ombi_request_title")
+  jellyfinTitle         String?               @map("movi_jellyfin_title")
+  ombiRequestTitle      String?               @map("movi_ombi_request_title")
 
-  jellyfinId        String?               @unique() @map("movi_jellyfin_id")
-  radarrId          String?               @unique() @map("movi_radarr_id")
-  ombiRequestId     String?               @unique() @map("movi_ombi_request_id")
-  tmdbId            String?               @unique() @map("movi_tmdb_id")
-  imdbId            String?               @unique() @map("movi_imdb_id")
+  radarrTitle           String?               @map("movi_radarr_title")
+  radarrPosterImage     String?               @map("movi_radarr_poster_image")
+  radarrBannerImage     String?               @map("movi_radarr_banner_image")
+  radarrFanartImage     String?               @map("movi_radarr_fanart_image")
+  radarrScreenshotImage String?               @map("movi_radarr_screenshot_image")
+  radarrHeadshotImage   String?               @map("movi_radarr_headshot_image")
 
-  jellyfinState     JellyfinDataState?    @map("movi_jellyfin_state")
-  radarrState       RadarrDataState?      @map("movi_radarr_state")
-  ombiRequestState  OmbiRequestDataState? @map("movi_ombi_request_state")
+  jellyfinId            String?               @unique() @map("movi_jellyfin_id")
+  radarrId              String?               @unique() @map("movi_radarr_id")
+  ombiRequestId         String?               @unique() @map("movi_ombi_request_id")
+  tmdbId                String?               @unique() @map("movi_tmdb_id")
+  imdbId                String?               @unique() @map("movi_imdb_id")
 
-  videoTracks       MovieVideoTrack[]
-  audioTracks       MovieAudioTrack[]
-  subtitleTracks    MovieSubtitleTrack[]
+  jellyfinState         JellyfinDataState?    @map("movi_jellyfin_state")
+  radarrState           RadarrDataState?      @map("movi_radarr_state")
+  ombiRequestState      OmbiRequestDataState? @map("movi_ombi_request_state")
+
+  videoTracks           MovieVideoTrack[]
+  audioTracks           MovieAudioTrack[]
+  subtitleTracks        MovieSubtitleTrack[]
 }
 
 model MovieAudioTrack {
