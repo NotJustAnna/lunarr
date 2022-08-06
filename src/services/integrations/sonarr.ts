@@ -30,6 +30,7 @@ export class SonarrIntegrationService {
       tvMazeId: (external.tvMazeId && external.tvMazeId !== 0) ? String(external.tvMazeId) : null,
       tvRageId: (external.tvRageId && external.tvRageId !== 0) ? String(external.tvRageId) : null,
       sonarrTitle: external.title,
+      sonarrOverview: external.overview,
       sonarrState: external.monitored ? SonarrDataState.MONITORED : SonarrDataState.UNMONITORED,
     };
 
@@ -54,6 +55,7 @@ export class SonarrIntegrationService {
   async syncEpisode(seasonId: ShowSeason['id'], external: SonarrEpisode) {
     const changes: Partial<ShowEpisode> = {
       sonarrTitle: external.title,
+      sonarrOverview: external.overview,
       sonarrId: String(external.id),
       sonarrState: external.monitored ?
         (external.hasFile ? SonarrEpisodeDataState.AVAILABLE : SonarrEpisodeDataState.MONITORED)

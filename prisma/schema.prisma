@@ -16,6 +16,7 @@ model Movie {
   jellyfinTitle         String?               @map("movi_jellyfin_title")
 
   radarrTitle           String?               @map("movi_radarr_title")
+  radarrOverview        String?               @map("movi_radarr_overview")
   radarrPosterImage     String?               @map("movi_radarr_poster_image")
   radarrBannerImage     String?               @map("movi_radarr_banner_image")
   radarrFanartImage     String?               @map("movi_radarr_fanart_image")
@@ -23,6 +24,7 @@ model Movie {
   radarrHeadshotImage   String?               @map("movi_radarr_headshot_image")
 
   ombiTitle             String?               @map("movi_ombi_title")
+  ombiOverview          String?               @map("movi_ombi_overview")
   ombiPosterImage       String?               @map("movi_ombi_poster_image")
   ombiBackgroundImage   String?               @map("movi_ombi_background_image")
 
@@ -94,6 +96,7 @@ model Show {
   jellyfinTitle         String?             @map("show_jellyfin_title")
 
   sonarrTitle           String?             @map("show_sonarr_title")
+  sonarrOverview        String?             @map("show_sonarr_overview")
   sonarrPosterImage     String?             @map("show_sonarr_poster_image")
   sonarrBannerImage     String?             @map("show_sonarr_banner_image")
   sonarrFanartImage     String?             @map("show_sonarr_fanart_image")
@@ -101,6 +104,7 @@ model Show {
   sonarrHeadshotImage   String?             @map("show_sonarr_headshot_image")
 
   ombiTitle             String?             @map("show_ombi_title")
+  ombiOverview          String?             @map("show_ombi_overview")
   ombiPosterImage       String?             @map("show_ombi_poster_image")
   ombiBackgroundImage   String?             @map("show_ombi_background_image")
 
@@ -141,8 +145,12 @@ model ShowEpisode {
   createdAt             DateTime                @default(now()) @db.Timestamp(6) @map("shep_created_at")
 
   jellyfinTitle         String?                 @map("shep_jellyfin_title")
+
   sonarrTitle           String?                 @map("shep_sonarr_title")
+  sonarrOverview        String?                 @map("shep_sonarr_overview")
+
   ombiTitle             String?                 @map("shep_ombi_title")
+  ombiOverview          String?                 @map("shep_ombi_overview")
 
   jellyfinId            String?                 @unique() @map("shep_jellyfin_id")
   sonarrId              String?                 @unique() @map("shep_sonarr_id")

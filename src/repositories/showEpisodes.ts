@@ -4,6 +4,7 @@ import { ChangeSetService } from '@/services/events/changeSet';
 import _ from 'lodash';
 import ShowEpisodeWhereInput = Prisma.ShowEpisodeWhereInput;
 import TransactionClient = Prisma.TransactionClient;
+import { merge } from '@/utils/merge';
 
 @Service()
 export class ShowEpisodesRepository {
@@ -106,17 +107,7 @@ export class ShowEpisodesRepository {
         }
         return;
       }
-      const merged = episodes.reduce((episode, duplicate) => {
-        episode.sonarrTitle = duplicate.sonarrTitle || episode.sonarrTitle;
-        episode.jellyfinTitle = duplicate.jellyfinTitle || episode.jellyfinTitle;
-        episode.ombiTitle = duplicate.ombiTitle || episode.ombiTitle;
-        episode.jellyfinId = duplicate.jellyfinId || episode.jellyfinId;
-        episode.sonarrId = duplicate.sonarrId || episode.sonarrId;
-        episode.jellyfinState = duplicate.jellyfinState || episode.jellyfinState;
-        episode.sonarrState = duplicate.sonarrState || episode.sonarrState;
-        episode.ombiState = duplicate.ombiState || episode.ombiState;
-        return episode;
-      });
+      const merged = merge(episodes, ['id', 'seasonId', 'number', 'createdAt']);
       const { id, ...mergedChanges } = merged;
       const mergedEpisodes = episodes.slice(1).map(s => s.id);
       await client.showEpisode.deleteMany({ where: { id: { in: mergedEpisodes } } });
