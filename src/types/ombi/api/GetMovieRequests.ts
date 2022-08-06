@@ -21,11 +21,11 @@ export interface MovieRequest {
   canApprove: boolean;
   imdbId: string;
   overview: string;
-  posterPath: string;
+  posterPath: null | string;
   releaseDate: string;
   digitalReleaseDate: null;
   status: string;
-  background: string;
+  background: null | string;
   released: boolean;
   digitalRelease: boolean;
   title: string;

@@ -23,7 +23,7 @@ import { Show } from '@prisma/client';
 function titleOf(show: Show) {
   if (show.jellyfinTitle) return show.jellyfinTitle;
   if (show.sonarrTitle) return show.sonarrTitle;
-  if (show.ombiRequestTitle) return show.ombiRequestTitle;
+  if (show.ombiTitle) return show.ombiTitle;
   if (show.tvdbId) return `Unnamed Show (TVDB ${show.tvdbId})`;
   if (show.imdbId) return `Unnamed Show (IMDB ${show.imdbId})`;
   return `Unnamed Show (Internal ID: ${show.id})`;
