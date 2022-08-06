@@ -14,69 +14,71 @@ export class ShowEpisodesRepository {
   }
 
   async sync(seasonId: string, number: number, changes: Omit<Partial<ShowEpisode>, 'seasonId' | 'number'>) {
-    const episode = await this.client.showEpisode.findUnique({
-      where: { seasonId_number: { seasonId, number } },
+    return this.client.$transaction(async (client) => {
+      const episode = await client.showEpisode.findUnique({
+        where: { seasonId_number: { seasonId, number } },
+      });
+      if (episode) {
+        const updatedEpisode = await client.showEpisode.update({ data: changes, where: { id: episode.id } });
+        this.events.fromShowEpisodeChanges(episode, { seasonId, number, ...changes });
+        return updatedEpisode;
+      } else {
+        const newEpisode = await client.showEpisode.create({ data: { seasonId, number, ...changes } });
+        this.events.fromNewShowEpisode(newEpisode);
+        return newEpisode;
+      }
     });
-    if (episode) {
-      const updatedEpisode = await this.client.showEpisode.update({ data: changes, where: { id: episode.id } });
-      await this.events.fromShowEpisodeChanges(episode, { seasonId, number, ...changes });
-      return updatedEpisode;
-    } else {
-      const newEpisode = await this.client.showEpisode.create({ data: { seasonId, number, ...changes } });
-      await this.events.fromNewShowEpisode(newEpisode);
-      return newEpisode;
-    }
   }
 
   async foreignUntrack<State extends keyof ShowEpisode>(
     seasonId: ShowSeason['id'], numbers: ShowEpisode['number'][],
     stateKey: State, allowedState: ShowEpisodeWhereInput[State],
   ) {
-    const episodes = await this.client.showEpisode.findMany({
-      where: {
-        seasonId,
-        number: { in: numbers },
-        [stateKey]: { not: allowedState },
-      },
-    });
-
-    if (episodes.length > 0) {
-      await this.client.showEpisode.updateMany({
-        data: { [stateKey]: allowedState },
-        where: { id: { in: episodes.map(e => e.id) } },
+    return this.client.$transaction(async (client) => {
+      const episodes = await client.showEpisode.findMany({
+        where: {
+          seasonId,
+          number: { in: numbers },
+          [stateKey]: { not: allowedState },
+        },
       });
-      await Promise.all(
-        episodes.map(
-          e => this.events.fromShowEpisodeChanges(e, { [stateKey]: allowedState }),
-        ),
-      );
-    }
+
+      if (episodes.length > 0) {
+        await client.showEpisode.updateMany({
+          data: { [stateKey]: allowedState },
+          where: { id: { in: episodes.map(e => e.id) } },
+        });
+        for (const e of episodes) {
+          this.events.fromShowEpisodeChanges(e, { [stateKey]: allowedState });
+        }
+      }
+    });
   }
 
   async inheritUntrack<ParentState extends keyof ShowSeason, State extends keyof ShowEpisode>(
     parentStateKey: ParentState, parentStateValue: ShowSeason[ParentState],
     stateKey: State, acceptedStateValue: ShowEpisodeWhereInput[State],
   ) {
-    const episodes = await this.client.showEpisode.findMany({
-      where: {
-        season: {
-          [parentStateKey]: parentStateValue,
+    return this.client.$transaction(async (client) => {
+      const episodes = await client.showEpisode.findMany({
+        where: {
+          season: {
+            [parentStateKey]: parentStateValue,
+          },
+          [stateKey]: { not: acceptedStateValue },
         },
-        [stateKey]: { not: acceptedStateValue },
-      },
-    });
-
-    if (episodes.length > 0) {
-      await this.client.showEpisode.updateMany({
-        data: { [stateKey]: acceptedStateValue },
-        where: { id: { in: episodes.map(s => s.id) } },
       });
-      await Promise.all(
-        episodes.map(
-          e => this.events.fromShowEpisodeChanges(e, { [stateKey]: acceptedStateValue }),
-        ),
-      );
-    }
+
+      if (episodes.length > 0) {
+        await client.showEpisode.updateMany({
+          data: { [stateKey]: acceptedStateValue },
+          where: { id: { in: episodes.map(s => s.id) } },
+        });
+        for (const e of episodes) {
+          this.events.fromShowEpisodeChanges(e, { [stateKey]: acceptedStateValue });
+        }
+      }
+    });
   }
 
   async deleteUntracked() {

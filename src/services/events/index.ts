@@ -36,8 +36,10 @@ export class EventService {
   emit<K extends Exclude<keyof Events, 'all'>>(event: K, data: Events[K]): this;
   emit<S extends string | symbol>(event: Exclude<S, keyof Events>, data: any): this;
   emit(event: string, data: any): this {
-    this.eventEmitter.emit(event, data);
-    this.eventEmitter.emit('all', { event, data } as GenericEvent);
+    setImmediate(() => {
+      this.eventEmitter.emit(event, data);
+      this.eventEmitter.emit('all', { event, data } as GenericEvent);
+    });
     return this;
   }
 }
