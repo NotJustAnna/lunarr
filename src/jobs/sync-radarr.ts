@@ -35,7 +35,9 @@ export class SyncRadarrJob extends AbstractJob {
     const movies = response.data;
     SyncRadarrJob.logger.info(`Radarr sync complete! Found ${movies.length} movies.`);
 
-    await Promise.all(movies.map(movie => this.radarr.syncMovie(movie)));
+    for (const movie of movies) {
+      await this.radarr.syncMovie(movie);
+    }
     await this.radarr.untrackMovies(movies);
   }
 }

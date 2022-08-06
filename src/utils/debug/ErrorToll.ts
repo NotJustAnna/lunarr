@@ -8,9 +8,8 @@ export function ErrorToll(name: string) {
       try {
         return await oldValue.apply(this, args);
       } catch (error) {
-        logger.error(`${name} errored`, { error });
+        logger.error(`${name} errored`, { error, args });
         throw error;
-      } finally {
       }
     };
   };

@@ -44,7 +44,6 @@ export class ShowsRepository {
     return this.client.show.findMany();
   }
 
-  // @AsyncTimeTracker('ShowsRepository.sync')
   async sync(changes: Partial<Show>) {
     return this.client.$transaction(async (client) => {
       const shows = await client.show.findMany({
@@ -84,7 +83,7 @@ export class ShowsRepository {
         ShowsRepository.logger.debug(`Merged ${shows.length} shows in ${performance.now() - start}ms`);
         return updatedShow;
       }
-    });
+    }, { maxWait: 5000 });
   }
 
   async foreignUntrack<Key extends keyof Show, State extends keyof Show>(
@@ -108,7 +107,7 @@ export class ShowsRepository {
           this.events.fromShowChanges(s, { [foreignKey]: null, [stateKey]: allowedState });
         }
       }
-    });
+    }, { maxWait: 5000 });
   }
 
   async deleteUntracked() {

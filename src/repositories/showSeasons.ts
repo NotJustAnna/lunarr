@@ -32,7 +32,7 @@ export class ShowSeasonsRepository {
         this.events.fromNewShowSeason(newSeason);
         return newSeason;
       }
-    });
+    }, { maxWait: 5000 });
   }
 
   async foreignUntrack<State extends keyof ShowSeason>(
@@ -57,7 +57,7 @@ export class ShowSeasonsRepository {
           this.events.fromShowSeasonChanges(s, { [stateKey]: allowedState });
         }
       }
-    });
+    }, { maxWait: 5000 });
   }
 
   async inheritUntrack<ParentState extends keyof Show, State extends keyof ShowSeason>(
@@ -83,7 +83,7 @@ export class ShowSeasonsRepository {
           this.events.fromShowSeasonChanges(s, { [stateKey]: acceptedStateValue });
         }
       }
-    });
+    }, { maxWait: 5000 });
   }
 
   async deleteUntracked() {
