@@ -32,7 +32,9 @@ export class SyncOmbiMoviesJob extends AbstractJob {
     const response = await attempt(3, () => this.api.get<MovieRequest[]>(`/api/v1/Request/movie`));
     const requests = response.data;
     SyncOmbiMoviesJob.logger.info(`Ombi sync complete! Found ${requests.length} movies requests.`);
-    await Promise.all(requests.map(request => this.ombi.syncMovie(request)));
+    for (const request of requests) {
+      await this.ombi.syncMovie(request);
+    }
     await this.ombi.untrackMovies(requests);
   }
 }

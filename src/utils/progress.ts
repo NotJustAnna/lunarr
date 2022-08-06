@@ -1,19 +1,21 @@
-export async function withProgress<T>(
-  array: Promise<T>[],
-  minTimeElapsed: number,
-  onProgress: (done: number, total: number, shouldReport: boolean) => void,
-): Promise<T[]> {
-  const total = array.length;
-  let done = 0;
-  let shouldReport = minTimeElapsed !== 0;
+export class ProgressUtil {
+  public done = 0;
+  private shouldReport = this.minTimeElapsed !== 0;
 
-  return Promise.all(array.map(it => it.then((v) => {
-    done++;
-    onProgress(done, total, shouldReport || done === total);
-    if (minTimeElapsed !== 0 && shouldReport && done !== total) {
-      shouldReport = false;
-      setTimeout(() => shouldReport = true, minTimeElapsed);
+  constructor(
+    public readonly total: number,
+    public readonly minTimeElapsed: number,
+    private readonly onProgress: (done: number, total: number) => void,
+  ) {}
+
+  public next() {
+    this.done++;
+    if (this.shouldReport && this.done !== this.total) {
+      this.onProgress(this.done, this.total);
+      if (this.minTimeElapsed !== 0) {
+        this.shouldReport = false;
+        setTimeout(() => this.shouldReport = true, this.minTimeElapsed);
+      }
     }
-    return v;
-  })));
+  }
 }

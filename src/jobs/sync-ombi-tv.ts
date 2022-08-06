@@ -32,7 +32,9 @@ export class SyncOmbiTvJob extends AbstractJob {
     const response = await attempt(3, () => this.api.get<TvRequest[]>(`/api/v1/Request/tv`));
     const requests = response.data;
     SyncOmbiTvJob.logger.info(`Ombi sync complete! Found ${requests.length} TV requests.`);
-    await Promise.all(requests.map(request => this.ombi.syncShow(request)));
+    for (const request of requests) {
+      await this.ombi.syncShow(request);
+    }
     await this.ombi.untrackShows(requests);
   }
 }

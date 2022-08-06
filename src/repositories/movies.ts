@@ -73,7 +73,7 @@ export class MoviesRepository {
         MoviesRepository.logger.debug(`Merged ${movies.length} movies in ${performance.now() - start}ms`);
         return updatedMovie;
       }
-    });
+    }, { maxWait: 5000 });
   }
 
   async foreignUntrack<Key extends keyof Movie, State extends keyof Movie>(
@@ -99,7 +99,7 @@ export class MoviesRepository {
           ),
         );
       }
-    });
+    }, { maxWait: 5000 });
   }
 
   async deleteUntracked() {

@@ -27,7 +27,7 @@ export class ShowEpisodesRepository {
         this.events.fromNewShowEpisode(newEpisode);
         return newEpisode;
       }
-    });
+    }, { maxWait: 5000 });
   }
 
   async foreignUntrack<State extends keyof ShowEpisode>(
@@ -52,7 +52,7 @@ export class ShowEpisodesRepository {
           this.events.fromShowEpisodeChanges(e, { [stateKey]: allowedState });
         }
       }
-    });
+    }, { maxWait: 5000 });
   }
 
   async inheritUntrack<ParentState extends keyof ShowSeason, State extends keyof ShowEpisode>(
@@ -78,7 +78,7 @@ export class ShowEpisodesRepository {
           this.events.fromShowEpisodeChanges(e, { [stateKey]: acceptedStateValue });
         }
       }
-    });
+    }, { maxWait: 5000 });
   }
 
   async deleteUntracked() {
