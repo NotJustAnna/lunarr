@@ -23,8 +23,8 @@ export class MoviesRepository {
     if (changes.radarrId) {
       finders.push({ radarrId: changes.radarrId });
     }
-    if (changes.ombiRequestId) {
-      finders.push({ ombiRequestId: changes.ombiRequestId });
+    if (changes.ombiId) {
+      finders.push({ ombiId: changes.ombiId });
     }
     if (changes.tmdbId) {
       finders.push({ tmdbId: changes.tmdbId });
@@ -57,15 +57,15 @@ export class MoviesRepository {
           // movie.title = duplicate.title || movie.title;
           movie.jellyfinTitle = duplicate.jellyfinTitle || movie.jellyfinTitle;
           movie.radarrTitle = duplicate.radarrTitle || movie.radarrTitle;
-          movie.ombiRequestTitle = duplicate.ombiRequestTitle || movie.ombiRequestTitle;
+          movie.ombiTitle = duplicate.ombiTitle || movie.ombiTitle;
           movie.jellyfinId = duplicate.jellyfinId || movie.jellyfinId;
           movie.radarrId = duplicate.radarrId || movie.radarrId;
-          movie.ombiRequestId = duplicate.ombiRequestId || movie.ombiRequestId;
+          movie.ombiId = duplicate.ombiId || movie.ombiId;
           movie.tmdbId = duplicate.tmdbId || movie.tmdbId;
           movie.imdbId = duplicate.imdbId || movie.imdbId;
           movie.jellyfinState = duplicate.jellyfinState || movie.jellyfinState;
           movie.radarrState = duplicate.radarrState || movie.radarrState;
-          movie.ombiRequestState = duplicate.ombiRequestState || movie.ombiRequestState;
+          movie.ombiState = duplicate.ombiState || movie.ombiState;
           return movie;
         });
         const { id, ...mergedChanges } = merged;

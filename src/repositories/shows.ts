@@ -25,8 +25,8 @@ export class ShowsRepository {
     if (changes.sonarrId) {
       finders.push({ sonarrId: changes.sonarrId });
     }
-    if (changes.ombiRequestId) {
-      finders.push({ ombiRequestId: changes.ombiRequestId });
+    if (changes.ombiId) {
+      finders.push({ ombiId: changes.ombiId });
     }
     if (changes.tvdbId) {
       finders.push({ tvdbId: changes.tvdbId });
@@ -70,10 +70,10 @@ export class ShowsRepository {
           show.sonarrScreenshotImage = duplicate.sonarrScreenshotImage || show.sonarrScreenshotImage;
           show.sonarrHeadshotImage = duplicate.sonarrHeadshotImage || show.sonarrHeadshotImage;
           show.jellyfinTitle = duplicate.jellyfinTitle || show.jellyfinTitle;
-          show.ombiRequestTitle = duplicate.ombiRequestTitle || show.ombiRequestTitle;
+          show.ombiTitle = duplicate.ombiTitle || show.ombiTitle;
           show.jellyfinId = duplicate.jellyfinId || show.jellyfinId;
           show.sonarrId = duplicate.sonarrId || show.sonarrId;
-          show.ombiRequestId = duplicate.ombiRequestId || show.ombiRequestId;
+          show.ombiId = duplicate.ombiId || show.ombiId;
           show.tvdbId = duplicate.tvdbId || show.tvdbId;
           show.tvRageId = duplicate.tvRageId || show.tvRageId;
           show.tvMazeId = duplicate.tvMazeId || show.tvMazeId;

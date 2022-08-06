@@ -109,12 +109,12 @@ export class ShowEpisodesRepository {
       const merged = episodes.reduce((episode, duplicate) => {
         episode.sonarrTitle = duplicate.sonarrTitle || episode.sonarrTitle;
         episode.jellyfinTitle = duplicate.jellyfinTitle || episode.jellyfinTitle;
-        episode.ombiRequestTitle = duplicate.ombiRequestTitle || episode.ombiRequestTitle;
+        episode.ombiTitle = duplicate.ombiTitle || episode.ombiTitle;
         episode.jellyfinId = duplicate.jellyfinId || episode.jellyfinId;
         episode.sonarrId = duplicate.sonarrId || episode.sonarrId;
         episode.jellyfinState = duplicate.jellyfinState || episode.jellyfinState;
         episode.sonarrState = duplicate.sonarrState || episode.sonarrState;
-        episode.ombiRequestState = duplicate.ombiRequestState || episode.ombiRequestState;
+        episode.ombiState = duplicate.ombiState || episode.ombiState;
         return episode;
       });
       const { id, ...mergedChanges } = merged;
