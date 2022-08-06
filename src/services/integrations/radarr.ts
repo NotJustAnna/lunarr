@@ -7,6 +7,14 @@ import { MoviesRepository } from '@/repositories/movies';
 export class RadarrIntegrationService {
   constructor(private readonly movies: MoviesRepository) {}
 
+  private static readonly whenRadarrImageCoverType: Record<string, keyof Movie> = {
+    'poster': 'radarrPosterImage',
+    'banner': 'radarrBannerImage',
+    'fanart': 'radarrFanartImage',
+    'screenshot': 'radarrScreenshotImage',
+    'headshot': 'radarrHeadshotImage',
+  };
+
   async syncMovie(external: RadarrMovie) {
     const changes: Partial<Movie> = {
       radarrId: String(external.id),
@@ -17,6 +25,13 @@ export class RadarrIntegrationService {
         (external.hasFile ? RadarrDataState.AVAILABLE : RadarrDataState.MONITORED)
         : RadarrDataState.UNMONITORED,
     };
+
+    for (let image of external.images) {
+      const key = RadarrIntegrationService.whenRadarrImageCoverType[image.coverType];
+      if (key) {
+        changes[key] = image.remoteUrl as any;
+      }
+    }
 
     return this.movies.sync(changes);
   }
