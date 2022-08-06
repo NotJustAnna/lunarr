@@ -18,6 +18,16 @@ import { ChannelType, TextChannel } from 'discord.js';
 import { ShowsRepository } from '@/repositories/shows';
 import { ShowSeasonsRepository } from '@/repositories/showSeasons';
 import { ShowEpisodesRepository } from '@/repositories/showEpisodes';
+import { Show } from '@prisma/client';
+
+function titleOf(show: Show) {
+  if (show.jellyfinTitle) return show.jellyfinTitle;
+  if (show.sonarrTitle) return show.sonarrTitle;
+  if (show.ombiRequestTitle) return show.ombiRequestTitle;
+  if (show.tvdbId) return `Unnamed Show (TVDB ${show.tvdbId})`;
+  if (show.imdbId) return `Unnamed Show (IMDB ${show.imdbId})`;
+  return `Unnamed Show (Internal ID: ${show.id})`;
+}
 
 @Service()
 export class DiscordFeedService {
@@ -51,7 +61,7 @@ export class DiscordFeedService {
   @ListenerService.RegisterBuiltin('showCreated')
   private async showCreated({ show }: ShowCreatedEvent) {
     const channel = await this.feedChannel();
-    await channel.send(`${show.title} has been created`);
+    await channel.send(`${titleOf(show)} has been created`);
   }
 
   @ListenerService.RegisterBuiltin('showUpdated')
@@ -59,20 +69,20 @@ export class DiscordFeedService {
     const channel = await this.feedChannel();
 
     const debug = '```json\n' + JSON.stringify({ oldValues, newValues }, null, 4) + '\n```';
-    await channel.send(`${show.title} has been updated\n${debug}`);
+    await channel.send(`${titleOf(show)} has been updated\n${debug}`);
   }
 
   @ListenerService.RegisterBuiltin('showDeleted')
   private async showDeleted({ show }: ShowDeletedEvent) {
     const channel = await this.feedChannel();
-    await channel.send(`${show.title} has been deleted`);
+    await channel.send(`${titleOf(show)} has been deleted`);
   }
 
   @ListenerService.RegisterBuiltin('showSeasonCreated')
   private async showSeasonCreated({ showSeason }: ShowSeasonCreatedEvent) {
     const channel = await this.feedChannel();
     const show = await this.shows.getById(showSeason.showId);
-    await channel.send(`${show?.title} - Season ${showSeason.number} has been updated`);
+    await channel.send(`${titleOf(show!)} - Season ${showSeason.number} has been updated`);
   }
 
   @ListenerService.RegisterBuiltin('showSeasonUpdated')
@@ -80,14 +90,14 @@ export class DiscordFeedService {
     const channel = await this.feedChannel();
     const show = await this.shows.getById(showSeason.showId);
     const debug = '```json\n' + JSON.stringify({ oldValues, newValues }, null, 4) + '\n```';
-    await channel.send(`${show?.title} - Season ${showSeason.number} has been updated\n${debug}`);
+    await channel.send(`${titleOf(show!)} - Season ${showSeason.number} has been updated\n${debug}`);
   }
 
   @ListenerService.RegisterBuiltin('showSeasonDeleted')
   private async showSeasonDeleted(data: ShowSeasonDeletedEvent) {
     const channel = await this.feedChannel();
     const show = await this.shows.getById(data.showSeason.showId);
-    await channel.send(`${show?.title} - Season ${data.showSeason.number} has been deleted`);
+    await channel.send(`${titleOf(show!)} - Season ${data.showSeason.number} has been deleted`);
   }
 
   @ListenerService.RegisterBuiltin('showEpisodeCreated')
@@ -95,7 +105,7 @@ export class DiscordFeedService {
     const channel = await this.feedChannel();
     const showSeason = await this.showSeasons.getById(data.showEpisode.seasonId);
     const show = showSeason?.showId ? await this.shows.getById(showSeason.showId) : null;
-    await channel.send(`${show?.title} - Season ${showSeason?.number} - Episode ${data.showEpisode.number} has been created`);
+    await channel.send(`${titleOf(show!)} - Season ${showSeason?.number} - Episode ${data.showEpisode.number} has been created`);
   }
 
   @ListenerService.RegisterBuiltin('showEpisodeUpdated')
@@ -104,7 +114,7 @@ export class DiscordFeedService {
     const showSeason = await this.showSeasons.getById(showEpisode.seasonId);
     const show = showSeason?.showId ? await this.shows.getById(showSeason.showId) : null;
     const debug = '```json\n' + JSON.stringify({ oldValues, newValues }, null, 4) + '\n```';
-    await channel.send(`${show?.title} - Season ${showSeason?.number} - Episode ${showEpisode.number} has been updated\n${debug}`);
+    await channel.send(`${titleOf(show!)} - Season ${showSeason?.number} - Episode ${showEpisode.number} has been updated\n${debug}`);
   }
 
   @ListenerService.RegisterBuiltin('showEpisodeDeleted')
@@ -112,6 +122,6 @@ export class DiscordFeedService {
     const channel = await this.feedChannel();
     const showSeason = await this.showSeasons.getById(data.showEpisode.seasonId);
     const show = showSeason?.showId ? await this.shows.getById(showSeason.showId) : null;
-    await channel.send(`${show?.title} - Season ${showSeason?.number} - Episode ${data.showEpisode.number} has been deleted`);
+    await channel.send(`${titleOf(show!)} - Season ${showSeason?.number} - Episode ${data.showEpisode.number} has been deleted`);
   }
 }

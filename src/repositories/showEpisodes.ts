@@ -107,7 +107,9 @@ export class ShowEpisodesRepository {
         return;
       }
       const merged = episodes.reduce((episode, duplicate) => {
-        episode.title = duplicate.title || episode.title;
+        episode.sonarrTitle = duplicate.sonarrTitle || episode.sonarrTitle;
+        episode.jellyfinTitle = duplicate.jellyfinTitle || episode.jellyfinTitle;
+        episode.ombiRequestTitle = duplicate.ombiRequestTitle || episode.ombiRequestTitle;
         episode.jellyfinId = duplicate.jellyfinId || episode.jellyfinId;
         episode.sonarrId = duplicate.sonarrId || episode.sonarrId;
         episode.jellyfinState = duplicate.jellyfinState || episode.jellyfinState;

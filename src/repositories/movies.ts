@@ -54,7 +54,10 @@ export class MoviesRepository {
         const start = performance.now();
         // NOTE: Might be worth debugging why movies got duplicated.
         const merged = movies.reduce((movie, duplicate) => {
-          movie.title = duplicate.title || movie.title;
+          // movie.title = duplicate.title || movie.title;
+          movie.jellyfinTitle = duplicate.jellyfinTitle || movie.jellyfinTitle;
+          movie.radarrTitle = duplicate.radarrTitle || movie.radarrTitle;
+          movie.ombiRequestTitle = duplicate.ombiRequestTitle || movie.ombiRequestTitle;
           movie.jellyfinId = duplicate.jellyfinId || movie.jellyfinId;
           movie.radarrId = duplicate.radarrId || movie.radarrId;
           movie.ombiRequestId = duplicate.ombiRequestId || movie.ombiRequestId;

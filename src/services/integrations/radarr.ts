@@ -12,7 +12,7 @@ export class RadarrIntegrationService {
       radarrId: String(external.id),
       tmdbId: (external.tmdbId && external.tmdbId !== 0) ? String(external.tmdbId) : undefined,
       imdbId: (external.imdbId && external.imdbId !== '0') ? external.imdbId : undefined,
-      title: external.title,
+      radarrTitle: external.title,
       radarrState: external.monitored ?
         (external.hasFile ? RadarrDataState.AVAILABLE : RadarrDataState.MONITORED)
         : RadarrDataState.UNMONITORED,

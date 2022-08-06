@@ -13,7 +13,9 @@ model Movie {
   id                String                @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @map("movi_id")
   createdAt         DateTime              @default(now()) @db.Timestamp(6) @map("movi_created_at")
 
-  title             String?               @map("movi_title")
+  jellyfinTitle     String?               @map("movi_jellyfin_title")
+  radarrTitle       String?               @map("movi_radarr_title")
+  ombiRequestTitle  String?               @map("movi_ombi_request_title")
 
   jellyfinId        String?               @unique() @map("movi_jellyfin_id")
   radarrId          String?               @unique() @map("movi_radarr_id")
@@ -77,23 +79,26 @@ model MovieSubtitleTrack {
 }
 
 model Show {
-  id              String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @map("show_id")
-  createdAt       DateTime            @default(now()) @db.Timestamp(6) @map("show_created_at")
+  id                String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid @map("show_id")
+  createdAt         DateTime            @default(now()) @db.Timestamp(6) @map("show_created_at")
 
-  title           String?             @map("show_title")
+  jellyfinTitle     String?             @map("show_jellyfin_title")
+  sonarrTitle       String?             @map("show_sonarr_title")
+  ombiRequestTitle  String?             @map("show_ombi_request_title")
 
-  jellyfinId      String?             @unique() @map("show_jellyfin_id")
-  sonarrId        String?             @unique() @map("show_sonarr_id")
-  ombiRequestId   String?             @unique() @map("show_ombi_request_id")
-  tvdbId          String?             @unique() @map("show_tvdb_id")
-  tvRageId        String?             @unique() @map("show_tvrage_id")
-  tvMazeId        String?             @unique() @map("show_tvmaze_id")
-  imdbId          String?             @unique() @map("show_imdb_id")
 
-  jellyfinState   JellyfinDataState?  @map("show_jellyfin_state")
-  sonarrState     SonarrDataState?    @map("show_sonarr_state")
+  jellyfinId        String?             @unique() @map("show_jellyfin_id")
+  sonarrId          String?             @unique() @map("show_sonarr_id")
+  ombiRequestId     String?             @unique() @map("show_ombi_request_id")
+  tvdbId            String?             @unique() @map("show_tvdb_id")
+  tvRageId          String?             @unique() @map("show_tvrage_id")
+  tvMazeId          String?             @unique() @map("show_tvmaze_id")
+  imdbId            String?             @unique() @map("show_imdb_id")
 
-  seasons         ShowSeason[]
+  jellyfinState     JellyfinDataState?  @map("show_jellyfin_state")
+  sonarrState       SonarrDataState?    @map("show_sonarr_state")
+
+  seasons           ShowSeason[]
 }
 
 model ShowSeason {
@@ -118,7 +123,9 @@ model ShowEpisode {
   number                Int                     @map("shep_number")
   createdAt             DateTime                @default(now()) @db.Timestamp(6) @map("shep_created_at")
 
-  title                 String?                 @map("show_title")
+  jellyfinTitle         String?                 @map("shep_jellyfin_title")
+  sonarrTitle           String?                 @map("shep_sonarr_title")
+  ombiRequestTitle      String?                 @map("shep_ombi_request_title")
 
   jellyfinId            String?                 @unique() @map("shep_jellyfin_id")
   sonarrId              String?                 @unique() @map("shep_sonarr_id")
