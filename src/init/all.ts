@@ -7,6 +7,7 @@
  */
 export { DatabaseInitializer } from './database';
 export { HttpInitializer } from './http';
+export { FunInitializer } from './fun';
 
 export { BazarrIntegration } from './integrations/bazarr';
 export * from './integrations/discord/all';
