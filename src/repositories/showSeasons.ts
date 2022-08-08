@@ -1,14 +1,14 @@
-import { Service } from 'typedi';
 import { Prisma, PrismaClient, Show, ShowSeason } from '@prisma/client';
 import { ChangeSetService } from '@/services/events/changeSet';
 import { createLogger } from '@/app/logger';
 import _ from 'lodash';
 import { ShowEpisodesRepository } from '@/repositories/showEpisodes';
+import { merge } from '@/utils/merge';
+import { singleton } from 'tsyringe';
 import ShowSeasonWhereInput = Prisma.ShowSeasonWhereInput;
 import TransactionClient = Prisma.TransactionClient;
-import { merge } from '@/utils/merge';
 
-@Service()
+@singleton()
 export class ShowSeasonsRepository {
   private readonly logger = createLogger(ShowSeasonsRepository.name);
 

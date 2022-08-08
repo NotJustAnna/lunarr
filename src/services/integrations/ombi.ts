@@ -1,11 +1,11 @@
-import { Service } from 'typedi';
 import { Movie, OmbiDataState, Show } from '@prisma/client';
 import { MovieRequest } from '@/types/ombi/api/GetMovieRequests';
 import { MoviesRepository } from '@/repositories/movies';
 import { TvRequest } from '@/types/ombi/api/GetTvRequests';
 import { ShowsRepository } from '@/repositories/shows';
+import { singleton } from 'tsyringe';
 
-@Service()
+@singleton()
 export class OmbiIntegrationService {
   private static readonly imagePrefix = 'http://image.tmdb.org/t/p/original';
 

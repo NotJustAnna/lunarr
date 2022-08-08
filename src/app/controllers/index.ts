@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express-serve-static-core';
 import { ControllerMetadata } from './metadata';
-import { Service, ServiceOptions } from 'typedi';
 
 type RouterHandler = (req: Request, res: Response) => (any | Promise<any>);
 
@@ -12,13 +11,10 @@ type MiddlewareRouterHandler = (
 
 export interface ControllerOptions<T = unknown> {
   path?: string;
-  service?: ServiceOptions<T>;
 }
 
 export function Controller<T = unknown>(options?: ControllerOptions): ClassDecorator {
-  const ServiceDecorator = Service(options?.service);
   return (target: any) => {
-    ServiceDecorator(target);
     ControllerMetadata.getOrCreate(target).basePath = options?.path ?? '/';
   };
 }

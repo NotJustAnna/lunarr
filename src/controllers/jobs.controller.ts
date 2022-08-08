@@ -1,7 +1,9 @@
 import { Controller, Get } from '@/app/controllers';
 import { JobService } from '@/services/jobs';
 import { Request, Response } from 'express';
+import { singleton } from 'tsyringe';
 
+@singleton()
 @Controller({ path: '/api/jobs' })
 export class JobsController {
   constructor(private readonly jobs: JobService) {

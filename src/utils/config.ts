@@ -1,7 +1,7 @@
 import { Exclude, instanceToPlain, plainToInstance, Type, TypeHelpOptions, TypeOptions } from 'class-transformer';
 import * as fs from 'fs-extra';
 import { createLogger } from '@/app/logger';
-import { Constructable } from 'typedi';
+import { constructor } from 'tsyringe/dist/typings/types';
 
 const _parent = Symbol('_parent');
 const _children = Symbol('_children');
@@ -16,7 +16,7 @@ export abstract class AbstractConfiguration {
   @Exclude()
   [_file]!: string;
 
-  static async load<T extends AbstractConfiguration>(cls: Constructable<T>, file: string): Promise<T> {
+  static async load<T extends AbstractConfiguration>(cls: constructor<T>, file: string): Promise<T> {
     try {
       const config = plainToInstance(cls, await fs.readJson(file));
       AbstractConfiguration.postInit(config, file);

@@ -1,7 +1,7 @@
 import { Awaitable } from '@/utils/types';
 
 export function bubbleWrap<T extends any[]>(
-  block: (...args: T) => Awaitable<any>,
+  block: (...args: T) => Awaitable,
   onError?: (error: any) => void,
 ): (...args: T) => void {
   return (...args: T) => {

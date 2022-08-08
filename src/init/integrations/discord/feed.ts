@@ -1,4 +1,3 @@
-import { Service } from 'typedi';
 import { DiscordIntegration } from '@/init/integrations/discord/index';
 import { ListenerService } from '@/services/events/listener';
 import {
@@ -19,6 +18,7 @@ import { ShowsRepository } from '@/repositories/shows';
 import { ShowSeasonsRepository } from '@/repositories/showSeasons';
 import { ShowEpisodesRepository } from '@/repositories/showEpisodes';
 import { Show } from '@prisma/client';
+import { singleton } from 'tsyringe';
 
 function titleOf(show: Show) {
   if (show.jellyfinTitle) return show.jellyfinTitle;
@@ -29,7 +29,7 @@ function titleOf(show: Show) {
   return `Unnamed Show (Internal ID: ${show.id})`;
 }
 
-@Service()
+@singleton()
 export class DiscordFeedService {
   private readonly logger = createLogger(DiscordFeedService.name);
 

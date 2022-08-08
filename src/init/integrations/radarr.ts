@@ -1,11 +1,11 @@
-import { Service } from 'typedi';
 import { createLogger } from '@/app/logger';
 import process from 'process';
 import { SyncRadarrJob } from '@/jobs/sync-radarr';
 import { RadarrIntegrationService } from '@/services/integrations/radarr';
 import { JobService } from '@/services/jobs';
+import { singleton } from 'tsyringe';
 
-@Service()
+@singleton()
 export class RadarrIntegration {
   private static readonly logger = createLogger('RadarrIntegration');
 
