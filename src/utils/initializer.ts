@@ -1,24 +1,25 @@
-import { Constructable, Container } from 'typedi';
 import { hasInit } from '@/app/init/interfaces';
+import { container } from 'tsyringe';
+import { constructor } from 'tsyringe/dist/typings/types';
 
-type BarrelFileImport = { [key: string]: Constructable<any> };
+type BarrelFileImport = { [key: string]: constructor<any> };
 
 export interface BatchInitializeResult {
   instances: any[];
   errors: { error: any; initializer: any }[];
 }
 
-export function fromBarrelFile(barrel: BarrelFileImport): Constructable<any>[] {
+export function fromBarrelFile(barrel: BarrelFileImport): constructor<any>[] {
   return Object.values(barrel);
 }
 
-export async function batchInitialize(initializers: Constructable<any>[] | BarrelFileImport) {
+export async function batchInitialize(initializers: constructor<any>[] | BarrelFileImport) {
   const result: BatchInitializeResult = { instances: [], errors: [] };
   const promises: Promise<any>[] = [];
 
   for (const initializer of (Array.isArray(initializers) ? initializers : Object.values(initializers))) {
     try {
-      const instance = Container.get(initializer);
+      const instance = container.resolve(initializer);
       if (hasInit(instance)) {
         const maybePromise = instance.init();
 

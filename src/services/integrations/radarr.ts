@@ -1,9 +1,9 @@
-import { Service } from 'typedi';
 import { RadarrMovie } from '@/types/radarr/api/RadarrMovie';
 import { Movie, RadarrDataState } from '@prisma/client';
 import { MoviesRepository } from '@/repositories/movies';
+import { singleton } from 'tsyringe';
 
-@Service()
+@singleton()
 export class RadarrIntegrationService {
   constructor(private readonly movies: MoviesRepository) {}
 

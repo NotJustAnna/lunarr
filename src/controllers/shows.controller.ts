@@ -1,7 +1,9 @@
 import { Controller, Get } from '@/app/controllers';
 import { Request, Response } from 'express';
 import { ShowsRepository } from '@/repositories/shows';
+import { singleton } from 'tsyringe';
 
+@singleton()
 @Controller({ path: '/api/shows' })
 export class ShowsController {
   constructor(private readonly shows: ShowsRepository) {

@@ -1,11 +1,11 @@
-import { Service } from 'typedi';
 import { createLogger } from '@/app/logger';
 import process from 'process';
 import { SyncSonarrJob } from '@/jobs/sync-sonarr';
 import { SonarrIntegrationService } from '@/services/integrations/sonarr';
 import { JobService } from '@/services/jobs';
+import { singleton } from 'tsyringe';
 
-@Service()
+@singleton()
 export class SonarrIntegration {
   private static readonly logger = createLogger('SonarrIntegration');
 

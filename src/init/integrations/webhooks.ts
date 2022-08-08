@@ -1,8 +1,8 @@
-import { Service } from 'typedi';
 import { ListenerService } from '@/services/events/listener';
 import { GenericEvent } from '@/services/events/interfaces';
+import { singleton } from 'tsyringe';
 
-@Service()
+@singleton()
 export class WebhooksIntegration {
   constructor(eventListener: ListenerService) {
     eventListener.registerBuiltinListeners(this);

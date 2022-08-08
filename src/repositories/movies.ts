@@ -1,12 +1,12 @@
-import { Service } from 'typedi';
 import { createLogger } from '@/app/logger';
 import { Movie, Prisma, PrismaClient } from '@prisma/client';
 import { ChangeSetService } from '@/services/events/changeSet';
 import { performance } from 'perf_hooks';
-import MovieWhereInput = Prisma.MovieWhereInput;
 import { merge } from '@/utils/merge';
+import { singleton } from 'tsyringe';
+import MovieWhereInput = Prisma.MovieWhereInput;
 
-@Service()
+@singleton()
 export class MoviesRepository {
   private static readonly logger = createLogger('MoviesRepository');
 

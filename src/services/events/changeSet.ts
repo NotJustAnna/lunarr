@@ -1,9 +1,9 @@
-import { Service } from 'typedi';
 import { Movie, Show, ShowEpisode, ShowSeason } from '@prisma/client';
 import { microDiff } from '@/utils/microDiff';
 import { EventService } from '@/services/events/index';
+import { singleton } from 'tsyringe';
 
-@Service()
+@singleton()
 export class ChangeSetService {
   constructor(
     private readonly eventService: EventService,

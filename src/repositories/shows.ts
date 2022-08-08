@@ -1,13 +1,13 @@
 import { createLogger } from '@/app/logger';
 import { Prisma, PrismaClient, Show } from '@prisma/client';
-import { Service } from 'typedi';
 import { ChangeSetService } from '@/services/events/changeSet';
 import { ShowSeasonsRepository } from '@/repositories/showSeasons';
 import { performance } from 'perf_hooks';
-import ShowWhereInput = Prisma.ShowWhereInput;
 import { merge } from '@/utils/merge';
+import { singleton } from 'tsyringe';
+import ShowWhereInput = Prisma.ShowWhereInput;
 
-@Service()
+@singleton()
 export class ShowsRepository {
   private static readonly logger = createLogger('ShowsRepository');
 

@@ -1,12 +1,12 @@
-import { Service } from 'typedi';
 import { createLogger } from '@/app/logger';
 import * as process from 'process';
 import { REST } from '@discordjs/rest';
 import { GatewayIntentBits, Routes } from 'discord-api-types/v9';
 import { Client, Interaction, SlashCommandBuilder } from 'discord.js';
 import { DiscordConfig } from '@/app/config/discord';
+import { singleton } from 'tsyringe';
 
-@Service()
+@singleton()
 export class DiscordIntegration {
   private static readonly logger = createLogger('DiscordIntegration');
 

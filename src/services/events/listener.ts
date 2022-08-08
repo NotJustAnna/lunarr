@@ -5,12 +5,12 @@ import { bubbleWrap } from '@/utils/functions';
 import { createLogger } from '@/app/logger';
 import { Client, ClientEvents } from 'discord.js';
 import { DiscordIntegration } from '@/init/integrations/discord';
-import { Service } from 'typedi';
+import { singleton } from 'tsyringe';
 
 const _builtinRegistrations = Symbol('_builtinRegistrations');
 const _discordRegistrations = Symbol('_discordRegistrations');
 
-@Service()
+@singleton()
 export class ListenerService {
   private static readonly logger = createLogger(ListenerService.name);
 

@@ -1,10 +1,10 @@
 import { EventEmitter } from 'events';
 import { Events, GenericEvent } from '@/services/events/interfaces';
-import { Service } from 'typedi';
 import { Awaitable } from '@/utils/types';
 import { createLogger } from '@/app/logger';
+import { singleton } from 'tsyringe';
 
-@Service()
+@singleton()
 export class EventService {
   private static readonly logger = createLogger(EventService.name);
 

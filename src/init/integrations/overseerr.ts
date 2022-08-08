@@ -1,6 +1,6 @@
-import { Service } from 'typedi';
+import { singleton } from 'tsyringe';
 
-@Service()
+@singleton()
 export class OverseerrIntegration {
 
 }

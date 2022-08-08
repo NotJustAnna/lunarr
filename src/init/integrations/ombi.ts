@@ -1,12 +1,12 @@
-import { Service } from 'typedi';
 import { createLogger } from '@/app/logger';
 import process from 'process';
 import { SyncOmbiMoviesJob } from '@/jobs/sync-ombi-movies';
 import { SyncOmbiTvJob } from '@/jobs/sync-ombi-tv';
 import { OmbiIntegrationService } from '@/services/integrations/ombi';
 import { JobService } from '@/services/jobs';
+import { singleton } from 'tsyringe';
 
-@Service()
+@singleton()
 export class OmbiIntegration {
   private static readonly logger = createLogger('OmbiIntegration');
 

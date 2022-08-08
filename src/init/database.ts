@@ -1,12 +1,12 @@
-import { Service } from 'typedi';
 import { ShowsRepository } from '@/repositories/shows';
 import { ShowSeasonsRepository } from '@/repositories/showSeasons';
 import { ShowEpisodesRepository } from '@/repositories/showEpisodes';
 import { MoviesRepository } from '@/repositories/movies';
 import { JobService } from '@/services/jobs';
 import { DatabaseCleanupJob } from '@/jobs/database-cleanup';
+import { singleton } from 'tsyringe';
 
-@Service()
+@singleton()
 export class DatabaseInitializer {
   constructor(
     private readonly shows: ShowsRepository,

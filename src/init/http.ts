@@ -1,7 +1,6 @@
 import { cwd } from 'process';
 import express from 'express';
 import { createLogger } from '@/app/logger';
-import { Service } from 'typedi';
 import * as batchControllers from '@/controllers/all';
 import { AsyncInit } from '@/app/init/interfaces';
 import { ControllerMetadata } from '@/app/controllers/metadata';
@@ -10,8 +9,9 @@ import { HttpConfig } from '@/app/config/http';
 import * as fs from 'fs-extra';
 import { batchInitialize } from '@/utils/initializer';
 import { ExitCode } from '@/utils/exitCode';
+import { singleton } from 'tsyringe';
 
-@Service()
+@singleton()
 export class HttpInitializer implements AsyncInit {
   private static readonly logger = createLogger('HttpInitializer');
 

@@ -1,8 +1,8 @@
-import { Service } from 'typedi';
 import process from 'process';
 import { NanoflakeLocalGenerator } from 'nanoflakes';
+import { singleton } from 'tsyringe';
 
-@Service()
+@singleton()
 export class AuthService {
   private inMemoryFlatAssocs: Record<string, string> = {};
 

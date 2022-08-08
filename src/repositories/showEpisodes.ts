@@ -1,12 +1,12 @@
-import { Service } from 'typedi';
 import { Prisma, PrismaClient, ShowEpisode, ShowSeason } from '@prisma/client';
 import { ChangeSetService } from '@/services/events/changeSet';
 import _ from 'lodash';
+import { merge } from '@/utils/merge';
+import { singleton } from 'tsyringe';
 import ShowEpisodeWhereInput = Prisma.ShowEpisodeWhereInput;
 import TransactionClient = Prisma.TransactionClient;
-import { merge } from '@/utils/merge';
 
-@Service()
+@singleton()
 export class ShowEpisodesRepository {
   constructor(
     private readonly client: PrismaClient,

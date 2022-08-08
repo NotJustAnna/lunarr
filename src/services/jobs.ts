@@ -1,7 +1,7 @@
-import { Service } from 'typedi';
 import { AbstractJob } from '@/app/jobs';
+import { singleton } from 'tsyringe';
 
-@Service()
+@singleton()
 export class JobService {
   private readonly jobs = new Map<string, AbstractJob>;
 
