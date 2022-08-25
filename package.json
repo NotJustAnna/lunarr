@@ -22,7 +22,7 @@
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
     "nanoflakes": "^1.0.2",
-    "pg": "^8.7.3",
+    "pg": "^8.8.0",
     "reflect-metadata": "^0.1.13",
     "source-map-support": "^0.5.21",
     "tsyringe": "^4.7.0",
