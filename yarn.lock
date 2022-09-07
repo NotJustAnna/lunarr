@@ -77,10 +77,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@prisma/client@^4.3.0":
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/@prisma/client/-/client-4.3.0.tgz#147e7d7d4f390af4810e672c11ea6a7ca72b0696"
-  integrity sha512-xCjLAOIOqVdjD+UZbUwx5dFocUmdsrMQFe0jXUswTUgc76NOQVh0L7Z+FCkNCVVZ9RSBfEFX22061Sa02OuPAQ==
+"@prisma/client@^4.3.1":
+  version "4.3.1"
+  resolved "https://registry.yarnpkg.com/@prisma/client/-/client-4.3.1.tgz#b9aad9bd9bd43e7f715ec1d763c8bd9273688800"
+  integrity sha512-FA0/d1VMJNWqzU7WVWTNWJ+lGOLR9JUBnF73GdIPAEVo/6dWk4gHx0EmgeU+SMv4MZoxgOeTBJF2azhg7x0hMw==
   dependencies:
     "@prisma/engines-version" "4.3.0-32.c875e43600dfe042452e0b868f7a48b817b9640b"
 
@@ -89,10 +89,10 @@
   resolved "https://registry.yarnpkg.com/@prisma/engines-version/-/engines-version-4.3.0-32.c875e43600dfe042452e0b868f7a48b817b9640b.tgz#a564dd6fb6f25405fe06164989ebd8a1e4bb3508"
   integrity sha512-8yWpXkQRmiSfsi2Wb/ZS5D3RFbeu/btL9Pm/gdF4phB0Lo5KGsDFMxFMgaD64mwED2nHc8ZaEJg/+4Jymb9Znw==
 
-"@prisma/engines@4.3.0":
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/@prisma/engines/-/engines-4.3.0.tgz#097784f5d044d4a364652420d3c4d6d4c0baa909"
-  integrity sha512-JAyU7+QEpLkVtgVMYBSPQt9sUcgFqA/MdD4mK7yx+ZyDfHQlP+nT1rmqFPZ3MofR0mAha7nr3rx0ZNN46gLp9Q==
+"@prisma/engines@4.3.1":
+  version "4.3.1"
+  resolved "https://registry.yarnpkg.com/@prisma/engines/-/engines-4.3.1.tgz#fb0ad69eded13827fb4cd81995a351c234e8327f"
+  integrity sha512-4JF/uMaEDAPdcdZNOrnzE3BvrbGpjgV0FcPT3EVoi6I86fWkloqqxBt+KcK/+fIRR0Pxj66uGR9wVH8U1Y13JA==
 
 "@sapphire/async-queue@^1.5.0":
   version "1.5.0"
@@ -555,10 +555,10 @@ dir-glob@^3.0.1:
   dependencies:
     path-type "^4.0.0"
 
-discord-api-types@^0.37.3, discord-api-types@^0.37.4:
-  version "0.37.4"
-  resolved "https://registry.yarnpkg.com/discord-api-types/-/discord-api-types-0.37.4.tgz#fe36f37114c944e7178ee7f878f2638326f3d266"
-  integrity sha512-QgqYlUokWM++hdwvAtgVNLjmFumPBzFy+uWnnfVDiwBXKm+5jXHJPk2lx2eilkv/706UpAJPLSk/uVCY9NocjA==
+discord-api-types@^0.37.3, discord-api-types@^0.37.7:
+  version "0.37.7"
+  resolved "https://registry.yarnpkg.com/discord-api-types/-/discord-api-types-0.37.7.tgz#78cc48d2ea563e3e04ec294991afb21ebe588d29"
+  integrity sha512-aQEx4JP1wYn6vRsPsIuVdcQq9hB1EAw9vnQFtuciI3Uqgis0CP/hfJxDkY+hOoAwq6vcCl8kWuMoMK50agCg9w==
 
 discord.js@^14.3.0:
   version "14.3.0"
@@ -577,10 +577,10 @@ discord.js@^14.3.0:
     undici "^5.9.1"
     ws "^8.8.1"
 
-dotenv@^16.0.0:
-  version "16.0.1"
-  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.0.1.tgz#8f8f9d94876c35dac989876a5d3a82a267fdce1d"
-  integrity sha512-1K6hR6wtk2FviQ4kEiSjFiH5rpzEVi8WW0x96aztHVMhEspNpc4DVOUTEHtEva5VThQ8IaBX1Pe4gSzpVVUsKQ==
+dotenv@^16.0.2:
+  version "16.0.2"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.0.2.tgz#0b0f8652c016a3858ef795024508cddc4bffc5bf"
+  integrity sha512-JvpYKUmzQhYoIFgK2MOnF3bciIZoItIIoryihy0rIA+H4Jy0FmgyKYAHCTN98P5ybGSJcIFbh6QKeJdtZd1qhA==
 
 ee-first@1.1.1:
   version "1.1.1"
@@ -1450,12 +1450,12 @@ postgres-interval@^1.1.0:
   dependencies:
     xtend "^4.0.0"
 
-prisma@^4.3.0:
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/prisma/-/prisma-4.3.0.tgz#2c989be1bc6298f28bb4db40521dabec46e7a388"
-  integrity sha512-Ii588H5IsbSun5BwpNQwrayrHKecFEZ6wDoJ7nr2IsqlMblmkA1dextGBObsG9tg+aIVhTrNa7OAbhbvEfqhdQ==
+prisma@^4.3.1:
+  version "4.3.1"
+  resolved "https://registry.yarnpkg.com/prisma/-/prisma-4.3.1.tgz#9e4c24e49710392be40ee75fb3d9341d7487881e"
+  integrity sha512-90xo06wtqil76Xsi3mNpc4Js3SdDRR5g4qb9h+4VWY4Y8iImJY6xc3PX+C9xxTSt1lr0Q89A0MLkJjd8ax6KiQ==
   dependencies:
-    "@prisma/engines" "4.3.0"
+    "@prisma/engines" "4.3.1"
 
 proxy-addr@~2.0.7:
   version "2.0.7"
@@ -1836,10 +1836,10 @@ utils-merge@1.0.1:
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
   integrity sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==
 
-uuid@^8.3.2:
-  version "8.3.2"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.2.tgz#80d5b5ced271bb9af6c445f21a1a04c606cefbe2"
-  integrity sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==
+uuid@^9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-9.0.0.tgz#592f550650024a38ceb0c562f2f6aa435761efb5"
+  integrity sha512-MXcSTerfPa4uqyzStbRoTgt5XIe3x5+42+q1sDuy3R5MDk66URdLMOZe5aPX/SQd+kuYAh0FdP/pO28IkQyTeg==
 
 v8-compile-cache-lib@^3.0.1:
   version "3.0.1"

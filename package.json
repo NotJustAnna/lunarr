@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@discordjs/rest": "^1.0.1",
-    "@prisma/client": "^4.3.0",
+    "@prisma/client": "^4.3.1",
     "axios": "^0.27.1",
     "bufferutil": "^4.0.6",
     "chalk": "^4.1.2",
@@ -12,9 +12,9 @@
     "class-validator": "^0.13.2",
     "cli-highlight": "^2.1.11",
     "deep-equal": "^2.0.5",
-    "discord-api-types": "^0.37.4",
+    "discord-api-types": "^0.37.7",
     "discord.js": "^14.3.0",
-    "dotenv": "^16.0.0",
+    "dotenv": "^16.0.2",
     "erlpack": "^0.1.4",
     "express": "^4.17.3",
     "express-async-errors": "^3.1.1",
@@ -27,7 +27,7 @@
     "source-map-support": "^0.5.21",
     "tsyringe": "^4.7.0",
     "utf-8-validate": "^5.0.9",
-    "uuid": "^8.3.2",
+    "uuid": "^9.0.0",
     "zlib-sync": "^0.1.7"
   },
   "devDependencies": {
@@ -42,7 +42,7 @@
     "@types/qs": "^6.9.7",
     "@types/serve-static": "^1.15.0",
     "@types/uuid": "^8.3.4",
-    "prisma": "^4.3.0",
+    "prisma": "^4.3.1",
     "rimraf": "^3.0.2",
     "ts-node": "^10.8.0",
     "tsconfig-paths": "^4.1.0",
