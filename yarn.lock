@@ -1847,10 +1847,10 @@ unpipe@1.0.0, unpipe@~1.0.0:
   resolved "https://registry.yarnpkg.com/unpipe/-/unpipe-1.0.0.tgz#b2bf4ee8514aae6165b4817829d21b2ef49904ec"
   integrity sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==
 
-utf-8-validate@^5.0.9:
-  version "5.0.9"
-  resolved "https://registry.yarnpkg.com/utf-8-validate/-/utf-8-validate-5.0.9.tgz#ba16a822fbeedff1a58918f2a6a6b36387493ea3"
-  integrity sha512-Yek7dAy0v3Kl0orwMlvi7TPtiCNrdfHNd7Gcc/pLq4BLXqfAmd0J7OWMizUQnTTJsyjKn02mU7anqwfmUP4J8Q==
+utf-8-validate@^6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/utf-8-validate/-/utf-8-validate-6.0.1.tgz#ca94aac987856c17c1b556b8b692323de98f521e"
+  integrity sha512-gAZEa1DMXeBiHEwxef81kLtZjBrC1hib7UWnsvMVtxY8oJGtDSXt9McWu2D6V/xgrjbfRBsS5UIGEUBg2SrAsg==
   dependencies:
     node-gyp-build "^4.3.0"
 
